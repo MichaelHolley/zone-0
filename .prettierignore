@@ -7,3 +7,7 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Garmin spec and generated types
+src/lib/server/garmin/openapi.json
+src/lib/server/garmin/schema.d.ts

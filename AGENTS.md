@@ -18,6 +18,8 @@ There is no stable URL for the OpenAPI JSON. The Swagger page embeds the spec (O
 1. Fetch the swagger-docs page HTML and find the `/component---src-pages-gc-developer-program-personal-swagger-docs-js-<hash>.js` script URL (the hash changes on deploys).
 2. Fetch that chunk and extract the string literal inside `JSON.parse('{"openapi":...}')`, then evaluate the literal and `JSON.parse` the result.
 
+The spec lives at `src/lib/server/garmin/openapi.json`. After updating it, regenerate `schema.d.ts` with `pnpm run garmin:types`.
+
 ## Git
 
 Work on `main`, unless explicitly told to work on a feature branch.
