@@ -31,9 +31,11 @@ export const getBody = query(async () => {
 		})
 		.toSorted((a, b) => a.date.localeCompare(b.date));
 
+	// The spec types startDate as ConnectDate, but the API returns a plain YYYY-MM-DD string.
+	const goalStart = (goal: { startDate?: unknown }) => String(goal.startDate ?? '');
 	const goal = (goals.userGoals ?? [])
 		.filter((g) => g.goalValue)
-		.toSorted((a, b) => (a.startDate?.localDate ?? '').localeCompare(b.startDate?.localDate ?? ''))
+		.toSorted((a, b) => goalStart(a).localeCompare(goalStart(b)))
 		.at(-1);
 
 	const latest = points.at(-1) ?? null;
