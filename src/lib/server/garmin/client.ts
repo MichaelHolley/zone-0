@@ -14,10 +14,7 @@ let token: Token | null = null;
 let pendingToken: Promise<Token> | null = null;
 
 function keyRejected(): never {
-	error(401, {
-		message: 'Your Garmin API key is invalid or has expired.',
-		code: 'GARMIN_KEY_INVALID'
-	});
+	error(401, 'Your Garmin API key is invalid or has expired.', { code: 'GARMIN_KEY_INVALID' });
 }
 
 /**
