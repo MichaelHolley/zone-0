@@ -49,6 +49,11 @@ function groupByWeek(activities: Activity[], weekOf: (date: IsoDate) => IsoDate)
 
 const sum = (values: number[]) => values.reduce((total, v) => total + v, 0);
 const average = (values: number[]) => (values.length ? sum(values) / values.length : null);
+const zoneSeconds = (activities: Activity[]) =>
+	HR_ZONES.map((zone) => ({
+		zone,
+		seconds: sum(activities.map((a) => a[`hrTimeInZone_${zone}`] ?? 0))
+	}));
 
 export const getWeeklyVolume = query(async () => {
 	const { activities, weeks, weekOf } = await lastYear();
@@ -160,10 +165,7 @@ export const getStrength = query(async () => {
 				count: sessions.filter((a) => utcDate(activityDate(a)).getUTCDay() === day).length
 			};
 		}),
-		zones: HR_ZONES.map((zone) => ({
-			zone,
-			seconds: sum(sessions.map((a) => a[`hrTimeInZone_${zone}`] ?? 0))
-		})),
+		zones: zoneSeconds(sessions),
 		sessions: sessions
 			.map((a) => ({
 				date: activityDate(a),
@@ -199,6 +201,7 @@ export const getCycling = query(async () => {
 	const byWeek = groupByWeek(rides, weekOf);
 
 	return {
+		zones: zoneSeconds(rides),
 		weeks: weeks.map((week) => ({
 			week: utcDate(week),
 			elevation: sum((byWeek.get(week) ?? []).map((a) => a.elevationGain ?? 0))

@@ -335,7 +335,7 @@ export function weekdayChart(rows: Strength['weekdays']) {
 	);
 }
 
-export function zoneShareChart(rows: Strength['zones']) {
+export function zoneShareChart(rows: Cycling['zones']) {
 	const total = rows.reduce((sum, row) => sum + row.seconds, 0);
 	return categoryChart(
 		rows.map(({ zone, seconds }) => {

@@ -17,7 +17,7 @@
 		type MeasurementSystem
 	} from '#lib/format.js';
 	import { getCycling } from '#lib/remote/training.remote.js';
-	import { RIDE_KINDS, elevationChart, speedChart, type Ride } from './charts.js';
+	import { RIDE_KINDS, elevationChart, speedChart, zoneShareChart, type Ride } from './charts.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
 
@@ -86,6 +86,14 @@
 			<Chart
 				definition={speedChart(data.rides, system)}
 				ariaLabel="Average speed of each outdoor ride, last 12 months"
+				height={200}
+			/>
+		</Panel>
+
+		<Panel title="Time in heart rate zones (%)">
+			<Chart
+				definition={zoneShareChart(data.zones)}
+				ariaLabel="Share of cycling time in each heart rate zone, last 12 months"
 				height={200}
 			/>
 		</Panel>
