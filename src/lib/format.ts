@@ -29,12 +29,6 @@ export function formatDistance(meters: number, system: MeasurementSystem): strin
 	return `${formatNumber(value, value < 100 ? 1 : 0)} ${distanceUnit(system)}`;
 }
 
-export function formatWeight(grams: number, system: MeasurementSystem, signed = false): string {
-	const value = toWeight(grams, system);
-	const sign = signed && value > 0 ? '+' : '';
-	return `${sign}${formatNumber(value, 1)} ${weightUnit(system)}`;
-}
-
 export function formatDuration(seconds: number): string {
 	const total = Math.round(seconds / 60);
 	const hours = Math.floor(total / 60);

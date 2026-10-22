@@ -53,7 +53,9 @@
 							{Math.round(workout.averageHr)}<span class="text-xs text-zinc-500"> bpm</span>
 						{/if}
 					</p>
-					<p class="col-span-3 col-start-2 text-xs text-zinc-500 md:col-span-1 md:text-right">
+					<p
+						class="col-span-2 col-start-2 text-xs text-zinc-500 md:col-span-1 md:col-start-auto md:text-right"
+					>
 						{workout.trainingEffect ? effectLabel(workout.trainingEffect) : ''}
 					</p>
 				</li>
