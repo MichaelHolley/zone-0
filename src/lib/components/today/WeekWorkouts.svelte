@@ -51,7 +51,7 @@
 					</p>
 					<p class="hidden text-right font-mono text-sm tabular-nums md:block">
 						{#if workout.averageHr}
-							{Math.round(workout.averageHr)}<span class="text-xs text-zinc-500"> bpm</span>
+							{Math.round(workout.averageHr)} <span class="text-xs text-zinc-500">bpm</span>
 						{/if}
 					</p>
 					<p

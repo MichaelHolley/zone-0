@@ -9,7 +9,7 @@ import {
 	sportOf,
 	weightedIntensityMinutes
 } from '#lib/server/garmin/data.js';
-import { addDays, weekStart } from '#lib/server/garmin/dates.js';
+import { addDays, weekStart, type IsoDate } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
 
 const TODAY_TTL = 5 * MINUTE;
@@ -20,18 +20,28 @@ function measured(value: number | undefined): number | null {
 	return value === undefined || value < 0 ? null : value;
 }
 
+function fetchDaily(calendarDate: IsoDate) {
+	return cached(`daily:${calendarDate}`, TODAY_TTL, async () =>
+		unwrap(
+			await garmin.GET('/usersummary-service/usersummary/daily', {
+				params: { query: { calendarDate } }
+			})
+		)
+	);
+}
+
+/** Until the watch syncs, today's summary is an empty shell, so show yesterday instead. */
+async function latestDaily(today: IsoDate) {
+	const daily = await fetchDaily(today);
+	return daily.includesWellnessData ? daily : fetchDaily(addDays(today, -1));
+}
+
 export const getVitals = query(async () => {
 	const { settings, today } = await getToday();
 	const trendStart = addDays(today, -(TREND_DAYS - 1));
 
 	const [daily, summaries] = await Promise.all([
-		cached(`daily:${today}`, TODAY_TTL, async () =>
-			unwrap(
-				await garmin.GET('/usersummary-service/usersummary/daily', {
-					params: { query: { calendarDate: today } }
-				})
-			)
-		),
+		latestDaily(today),
 		cached(`summaries:${trendStart}:${today}`, TODAY_TTL, () =>
 			fetchDailySummaries(trendStart, today)
 		)
@@ -43,6 +53,7 @@ export const getVitals = query(async () => {
 		.reduce((sum, s) => sum + weightedIntensityMinutes(s), 0);
 
 	return {
+		date: daily.calendarDate ?? today,
 		restingHr: {
 			value: measured(daily.restingHeartRate),
 			sevenDayAvg: measured(daily.lastSevenDaysAvgRestingHeartRate)
@@ -94,6 +105,6 @@ export const getWeekWorkouts = query(async () => {
 			duration: a.duration ?? 0,
 			distance: a.distance && a.distance > 0 ? a.distance : null,
 			averageHr: a.averageHR ?? null,
-			trainingEffect: a.trainingEffectLabel ?? null
+			trainingEffect: a.trainingEffectLabel === 'UNKNOWN' ? null : (a.trainingEffectLabel ?? null)
 		}));
 });

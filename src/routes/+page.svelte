@@ -21,7 +21,7 @@
 		description="Today's values with the last 4 weeks below"
 		skeletonHeight={232}
 	>
-		<VitalsTiles />
+		<VitalsTiles today={profile.today} />
 	</Section>
 
 	<Section title="This week" skeletonHeight={180}>

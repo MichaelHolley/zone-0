@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Chart } from '@tanstack/charts/svelte';
 	import Tile from '#lib/components/Tile.svelte';
-	import { formatNumber } from '#lib/format.js';
+	import { formatLongDate, formatNumber } from '#lib/format.js';
 	import { getVitals } from '#lib/remote/today.remote.js';
 	import { areaTrend, barTrend, lineTrend, rangeTrend } from './trends.js';
+
+	let { today }: { today: string } = $props();
 
 	const vitals = $derived(await getVitals());
 	const trend = $derived(vitals.trend);
@@ -22,6 +24,12 @@
 
 	const CHART_HEIGHT = 84;
 </script>
+
+{#if vitals.date !== today}
+	<p class="mb-3 text-sm text-zinc-500">
+		Nothing synced today yet. Showing {formatLongDate(vitals.date)}.
+	</p>
+{/if}
 
 <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
 	<Tile
