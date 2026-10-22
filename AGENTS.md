@@ -4,8 +4,23 @@
 - TypeScript
 - Tailwindcss
 
+## Garmin API
+
+The project integrates with the free Garmin Connect Personal API (personal use).
+
+Sources:
+
+- Overview and auth: https://developer.garmin.com/gc-developer-program/personal/personal-api/
+- Swagger docs: https://developer.garmin.com/gc-developer-program/personal/swagger-docs/
+
+There is no stable URL for the OpenAPI JSON. The Swagger page embeds the spec (OpenAPI 3.0.1, server `https://personal.connectapi.garmin.com`) in a hashed Gatsby JS chunk. To read it dynamically:
+
+1. Fetch the swagger-docs page HTML and find the `/component---src-pages-gc-developer-program-personal-swagger-docs-js-<hash>.js` script URL (the hash changes on deploys).
+2. Fetch that chunk and extract the string literal inside `JSON.parse('{"openapi":...}')`, then evaluate the literal and `JSON.parse` the result.
+
 ## Git
 
+Work on `main`, unless explicitly told to work on a feature branch.
 Use conventional commit messages like 'feat:', 'fix:', 'chore:', ...
 
 ## Feedback Loop
