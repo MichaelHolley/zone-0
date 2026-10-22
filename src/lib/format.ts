@@ -1,6 +1,7 @@
 export type MeasurementSystem = 'metric' | 'statute_us' | 'statute_uk';
 
 const METERS_PER_MILE = 1609.344;
+const FEET_PER_METER = 3.28084;
 const GRAMS_PER_POUND = 453.59237;
 const LOCALE = 'en-GB';
 
@@ -15,6 +16,17 @@ export function toDistance(meters: number, system: MeasurementSystem): number {
 
 export function toWeight(grams: number, system: MeasurementSystem): number {
 	return grams / (isMetric(system) ? 1000 : GRAMS_PER_POUND);
+}
+
+export const speedUnit = (system: MeasurementSystem) => (isMetric(system) ? 'km/h' : 'mph');
+export const elevationUnit = (system: MeasurementSystem) => (isMetric(system) ? 'm' : 'ft');
+
+export function toSpeed(metersPerSecond: number, system: MeasurementSystem): number {
+	return toDistance(metersPerSecond * 3600, system);
+}
+
+export function toElevation(meters: number, system: MeasurementSystem): number {
+	return isMetric(system) ? meters : meters * FEET_PER_METER;
 }
 
 export function formatNumber(value: number, digits = 0): string {

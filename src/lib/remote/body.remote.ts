@@ -50,3 +50,49 @@ export const getBody = query(async () => {
 		change365: latest && first && first !== latest ? latest.grams - first.grams : null
 	};
 });
+
+const FITNESS_AGE_COMPONENTS = [
+	{ key: 'vigorousDaysAvg', label: 'Vigorous days per week', unit: 'days' },
+	{ key: 'vigorousMinutesAvg', label: 'Vigorous minutes per week', unit: 'min' },
+	{ key: 'rhr', label: 'Resting heart rate', unit: 'bpm' },
+	{ key: 'bmi', label: 'BMI', unit: '' }
+] as const;
+
+export const getFitnessAge = query(async () => {
+	const { today } = await getToday();
+	const response = await cached(`fitnessAge:${today}`, HOUR, () =>
+		garmin
+			.GET('/fitnessage-service/fitnessage/v2/{calendarDate}', {
+				params: { path: { calendarDate: today } }
+			})
+			.then(unwrap)
+	);
+
+	// The spec types the response as an array, but the API returns a single object.
+	const dto: (typeof response)[number] | undefined = Array.isArray(response)
+		? response[0]
+		: (response as unknown as (typeof response)[number]);
+	if (dto?.fitnessAge == null) return null;
+
+	const components = FITNESS_AGE_COMPONENTS.flatMap(({ key, label, unit }) => {
+		const component = dto.components?.[key];
+		if (component?.value == null) return [];
+		return [
+			{
+				label,
+				unit,
+				value: component.value,
+				target: component.targetValue ?? null,
+				potentialAge: component.potentialAge ?? null,
+				priority: component.priority ?? Number.MAX_SAFE_INTEGER
+			}
+		];
+	}).toSorted((a, b) => a.priority - b.priority);
+
+	return {
+		fitnessAge: dto.fitnessAge,
+		chronologicalAge: dto.chronologicalAge ?? null,
+		achievableAge: dto.achievableFitnessAge ?? null,
+		components
+	};
+});
