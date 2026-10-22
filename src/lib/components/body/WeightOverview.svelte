@@ -4,6 +4,8 @@
 	import { Chart } from '@tanstack/charts/svelte';
 	import { tooltip } from '@tanstack/charts/tooltip';
 	import { scaleUtc } from 'd3-scale';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import Panel from '#lib/components/Panel.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import { ACCENT, chartTheme, dateTick } from '#lib/charts.js';
 	import {
@@ -58,10 +60,10 @@
 </script>
 
 {#if !body.current}
-	<div class="rounded-lg border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
-		<p class="text-sm font-medium text-zinc-900">No weight entries in the last 12 months</p>
-		<p class="mt-1 text-sm text-zinc-500">Log your weight in Garmin Connect to see it here.</p>
-	</div>
+	<EmptyState
+		title="No weight entries in the last 12 months"
+		description="Log your weight in Garmin Connect to see it here."
+	/>
 {:else}
 	<div
 		class={['grid gap-3 sm:grid-cols-2', body.current.bmi ? 'lg:grid-cols-4' : 'lg:grid-cols-3']}
@@ -88,9 +90,8 @@
 		{/if}
 	</div>
 
-	<div class="mt-3 rounded-lg border border-zinc-200 bg-white p-4">
-		<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-			<h3 class="text-sm text-zinc-500">Weight ({unit})</h3>
+	<Panel title="Weight ({unit})" class="mt-3">
+		{#snippet aside()}
 			{#if goal != null}
 				<p class="flex items-center gap-2 text-xs text-zinc-500">
 					<span class="w-5 border-t border-dashed border-zinc-500"></span>
@@ -98,7 +99,7 @@
 					{unit}
 				</p>
 			{/if}
-		</div>
+		{/snippet}
 		<Chart {definition} ariaLabel="Weight over the last 12 months" height={320} />
-	</div>
+	</Panel>
 {/if}

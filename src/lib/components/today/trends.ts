@@ -2,7 +2,7 @@ import { areaY, barY, defineChart, lineY, ruleY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { scaleUtc } from 'd3-scale';
-import { ACCENT, chartTheme, dateTick } from '#lib/charts.js';
+import { ACCENT, chartTheme, DAY_MS, dateTick, paddedTimeScale } from '#lib/charts.js';
 import { formatNumber, formatShortDate } from '#lib/format.js';
 import type { getVitals } from '#lib/remote/today.remote.js';
 
@@ -23,6 +23,16 @@ const axes = (first: Date, last: Date) => ({
 		axis: { line: false, ticks: { count: 3, size: 0 } }
 	}
 });
+
+function barAxes(rows: TrendRow[]) {
+	const scales = axes(...bounds(rows));
+	if (rows.length === 0) return scales;
+	const scale = paddedTimeScale(
+		rows.map((row) => row.date),
+		DAY_MS
+	);
+	return { ...scales, x: { ...scales.x, scale } };
+}
 
 const describe = (row: TrendRow, value: number | null | undefined, unit: string) =>
 	`${formatShortDate(row.date)}\n${value == null ? 'No data' : `${formatNumber(value)} ${unit}`}`;
@@ -53,7 +63,7 @@ export function lineTrend(
 export function barTrend(rows: TrendRow[], key: NumericKey, unit: string) {
 	return defineChart({
 		marks: [barY(rows, { x: 'date', y: key, fill: ACCENT, fillOpacity: 0.85, radius: { end: 2 } })],
-		scales: axes(...bounds(rows)),
+		scales: barAxes(rows),
 		theme: chartTheme,
 		tooltip: { use: tooltip, format: (p) => describe(p.datum, p.datum[key], unit) }
 	});

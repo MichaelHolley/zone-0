@@ -1,4 +1,5 @@
 <script lang="ts">
+	import EmptyState from '#lib/components/EmptyState.svelte';
 	import SportIcon from '#lib/components/SportIcon.svelte';
 	import {
 		formatDay,
@@ -20,10 +21,10 @@
 </script>
 
 {#if workouts.length === 0}
-	<div class="rounded-lg border border-dashed border-zinc-300 bg-white px-6 py-10 text-center">
-		<p class="text-sm font-medium text-zinc-900">No workouts yet this week</p>
-		<p class="mt-1 text-sm text-zinc-500">Activities appear here once your watch syncs.</p>
-	</div>
+	<EmptyState
+		title="No workouts yet this week"
+		description="Activities appear here once your watch syncs."
+	/>
 {:else}
 	<div class="rounded-lg border border-zinc-200 bg-white">
 		<p class="border-b border-zinc-200 px-4 py-2.5 text-xs text-zinc-500">
