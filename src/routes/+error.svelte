@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import KeyIcon from 'phosphor-svelte/lib/KeyIcon';
 	import WarningCircleIcon from 'phosphor-svelte/lib/WarningCircleIcon';
@@ -32,7 +33,7 @@
 		</h1>
 		<p class="mt-3 leading-relaxed text-zinc-600">{errorMessage(page.error)}</p>
 		<a
-			href="/"
+			href={resolve('/')}
 			class="mt-6 inline-block text-sm font-medium text-accent-ink underline underline-offset-2"
 		>
 			Back to today
