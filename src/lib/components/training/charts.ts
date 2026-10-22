@@ -1,4 +1,4 @@
-import { barY, defineChart, lineY, ruleY } from '@tanstack/charts';
+import { barY, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { scaleUtc } from 'd3-scale';
@@ -12,17 +12,28 @@ import {
 } from '#lib/charts.js';
 import {
 	distanceUnit,
+	elevationUnit,
 	formatLongDate,
 	formatNumber,
+	speedUnit,
 	toDistance,
+	toElevation,
+	toSpeed,
+	utcDate,
 	type MeasurementSystem
 } from '#lib/format.js';
-import type { getIntensityAndLoad, getWeeklyVolume } from '#lib/remote/training.remote.js';
+import type {
+	getCycling,
+	getIntensityAndLoad,
+	getWeeklyVolume
+} from '#lib/remote/training.remote.js';
 import { SPORTS, type Sport } from '#lib/sport.js';
 
 type Resolved<T extends (...args: never[]) => Promise<unknown>> = Awaited<ReturnType<T>>;
 type VolumeWeek = Resolved<typeof getWeeklyVolume>[number];
 type Intensity = Resolved<typeof getIntensityAndLoad>;
+type Cycling = Resolved<typeof getCycling>;
+export type Ride = Cycling['rides'][number];
 
 const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const monthTick = (value: Date) => monthFormat.format(value);
@@ -205,6 +216,54 @@ export function effectChart(rows: Intensity['trainingEffect']) {
 			use: tooltip,
 			format: (p) =>
 				`${weekLabel(p.datum.week)}\n${p.datum.kind} ${p.datum.value == null ? 'No data' : formatNumber(p.datum.value, 1)}`
+		}
+	});
+}
+
+export const RIDE_KINDS = [
+	{ label: 'Road', color: '#2563eb' },
+	{ label: 'Gravel', color: '#a16207' }
+] as const;
+
+export function elevationChart(rows: Cycling['weeks'], system: MeasurementSystem) {
+	const unit = elevationUnit(system);
+	const data = rows.map((row) => ({ ...row, elevation: toElevation(row.elevation, system) }));
+	return defineChart({
+		marks: [
+			barY(data, {
+				x: 'week',
+				y: 'elevation',
+				fill: sportColor('cycling'),
+				fillOpacity: 0.85,
+				radius: { end: 2 }
+			})
+		],
+		scales: barScales(rows),
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: (p) =>
+				`${weekLabel(p.datum.week)}\n${formatNumber(p.datum.elevation)} ${unit} climbed`
+		}
+	});
+}
+
+export function speedChart(rides: Ride[], system: MeasurementSystem) {
+	const unit = speedUnit(system);
+	const data = rides.flatMap(({ date, kind, speed }) =>
+		speed != null && kind !== 'Indoor'
+			? [{ date: utcDate(date), kind, speed: toSpeed(speed, system) }]
+			: []
+	);
+	return defineChart({
+		marks: [dot(data, { x: 'date', y: 'speed', color: 'kind', r: 4, fillOpacity: 0.85 })],
+		scales: { x: weekAxis, y: { ...valueAxis, nice: true } },
+		color: { domain: RIDE_KINDS.map((k) => k.label), range: RIDE_KINDS.map((k) => k.color) },
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: (p) =>
+				`${longDate(p.datum.date)}\n${p.datum.kind} ${formatNumber(p.datum.speed, 1)} ${unit}`
 		}
 	});
 }

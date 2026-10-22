@@ -4,6 +4,10 @@
 - TypeScript
 - Tailwindcss
 
+## Sport Priorities
+
+The user's sports, in order of priority: Strength Training (Gym), Cycling, Running. Weigh features, charts and data coverage accordingly.
+
 ## Garmin API
 
 The project integrates with the free Garmin Connect Personal API (personal use).

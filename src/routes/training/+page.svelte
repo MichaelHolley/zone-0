@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Section from '#lib/components/Section.svelte';
+	import Cycling from '#lib/components/training/Cycling.svelte';
 	import IntensityLoad from '#lib/components/training/IntensityLoad.svelte';
 	import RunningBests from '#lib/components/training/RunningBests.svelte';
 	import WeeklyVolume from '#lib/components/training/WeeklyVolume.svelte';
@@ -26,6 +27,10 @@
 		skeletonHeight={440}
 	>
 		<IntensityLoad />
+	</Section>
+
+	<Section title="Cycling" skeletonHeight={520}>
+		<Cycling system={profile.measurementSystem} />
 	</Section>
 
 	<Section title="Running bests" skeletonHeight={280}>

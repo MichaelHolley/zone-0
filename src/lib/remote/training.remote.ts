@@ -13,6 +13,9 @@ import { addDays, weekStart, weeksBetween, type IsoDate } from '#lib/server/garm
 import { getToday } from '#lib/server/garmin/settings.js';
 import { SPORTS } from '#lib/sport.js';
 
+const rideKind = (typeKey = '') =>
+	typeKey.includes('indoor') ? 'Indoor' : typeKey.includes('gravel') ? 'Gravel' : 'Road';
+
 const HR_ZONES = [1, 2, 3, 4, 5] as const;
 const RUNNING_BESTS = [
 	{ meters: 1000, label: '1 km' },
@@ -127,4 +130,28 @@ export const getRunningBests = query(async () => {
 		}
 		return best ? [{ meters, label, ...best }] : [];
 	});
+});
+
+export const getCycling = query(async () => {
+	const { activities, weeks, weekOf } = await lastYear();
+	const rides = activities.filter((a) => sportOf(a) === 'cycling');
+	const byWeek = groupByWeek(rides, weekOf);
+
+	return {
+		weeks: weeks.map((week) => ({
+			week: utcDate(week),
+			elevation: sum((byWeek.get(week) ?? []).map((a) => a.elevationGain ?? 0))
+		})),
+		rides: rides
+			.map((a) => ({
+				date: activityDate(a),
+				kind: rideKind(a.activityType?.typeKey),
+				distance: a.distance ?? 0,
+				movingSeconds: a.movingDuration ?? a.duration ?? 0,
+				elevation: a.elevationGain ?? 0,
+				speed: a.averageSpeed ?? null,
+				heartRate: a.averageHR ?? null
+			}))
+			.toSorted((a, b) => a.date.localeCompare(b.date))
+	};
 });
