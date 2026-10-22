@@ -17,33 +17,20 @@ function keyRejected(): never {
 	error(401, 'Your Garmin API key is invalid or has expired.', { code: 'GARMIN_KEY_INVALID' });
 }
 
-/**
- * The token endpoint is not part of the OpenAPI spec, so accept the common
- * field spellings and fall back to a conservative lifetime.
- */
-function parseToken(body: unknown): Token {
-	if (typeof body === 'string' && body.trim()) {
-		return { value: body.trim(), expiresAt: Date.now() + FALLBACK_TOKEN_TTL_MS };
+function jwtExpiry(jwt: string): number | null {
+	try {
+		const payload = jwt.split('.')[1].replaceAll('-', '+').replaceAll('_', '/');
+		const { exp } = JSON.parse(atob(payload));
+		return typeof exp === 'number' ? exp * 1000 : null;
+	} catch {
+		return null;
 	}
-	if (typeof body !== 'object' || body === null) {
-		throw new Error('Garmin token response is empty');
-	}
-	const record = body as Record<string, unknown>;
-	const value = [record.access_token, record.accessToken, record.token].find(
-		(v): v is string => typeof v === 'string' && v.length > 0
-	);
-	if (!value) throw new Error('Garmin token response has no token field');
+}
 
-	const expiresIn = Number(record.expires_in ?? record.expiresIn);
-	const expiresAtRaw = record.expires_at ?? record.expiresAt ?? record.expiration;
-	let expiresAt = Date.now() + FALLBACK_TOKEN_TTL_MS;
-	if (Number.isFinite(expiresIn) && expiresIn > 0) {
-		expiresAt = Date.now() + expiresIn * 1000;
-	} else if (typeof expiresAtRaw === 'number') {
-		expiresAt = expiresAtRaw < 1e12 ? expiresAtRaw * 1000 : expiresAtRaw;
-	} else if (typeof expiresAtRaw === 'string' && !Number.isNaN(Date.parse(expiresAtRaw))) {
-		expiresAt = Date.parse(expiresAtRaw);
-	}
+function parseToken(text: string): Token {
+	const value = text.trim();
+	if (!value) throw new Error('Garmin token response is empty');
+	const expiresAt = jwtExpiry(value) ?? Date.now() + FALLBACK_TOKEN_TTL_MS;
 	return { value, expiresAt: expiresAt - EXPIRY_MARGIN_MS };
 }
 
@@ -57,14 +44,7 @@ async function requestToken(): Promise<Token> {
 	if (response.status === 400 || response.status === 401 || response.status === 403) keyRejected();
 	if (!response.ok) throw new Error(`Garmin token request failed with ${response.status}`);
 
-	const text = await response.text();
-	let body: unknown = text;
-	try {
-		body = JSON.parse(text);
-	} catch {
-		// plain-text token
-	}
-	return parseToken(body);
+	return parseToken(await response.text());
 }
 
 async function accessToken(forceRefresh = false): Promise<string> {
