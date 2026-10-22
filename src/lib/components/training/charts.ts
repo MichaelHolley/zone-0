@@ -1,7 +1,7 @@
 import { barY, defineChart, lineY, ruleY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
-import { scaleLog, scaleUtc } from 'd3-scale';
+import { scaleUtc } from 'd3-scale';
 import {
 	ACCENT,
 	chartTheme,
@@ -17,19 +17,12 @@ import {
 	toDistance,
 	type MeasurementSystem
 } from '#lib/format.js';
-import type {
-	getIntensityAndLoad,
-	getPowerCurve,
-	getVo2Max,
-	getWeeklyVolume
-} from '#lib/remote/training.remote.js';
+import type { getIntensityAndLoad, getWeeklyVolume } from '#lib/remote/training.remote.js';
 import { SPORTS, type Sport } from '#lib/sport.js';
 
 type Resolved<T extends (...args: never[]) => Promise<unknown>> = Awaited<ReturnType<T>>;
 type VolumeWeek = Resolved<typeof getWeeklyVolume>[number];
 type Intensity = Resolved<typeof getIntensityAndLoad>;
-type Vo2Row = Resolved<typeof getVo2Max>[number];
-type PowerRow = Resolved<typeof getPowerCurve>[number];
 
 const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const monthTick = (value: Date) => monthFormat.format(value);
@@ -212,61 +205,6 @@ export function effectChart(rows: Intensity['trainingEffect']) {
 			use: tooltip,
 			format: (p) =>
 				`${weekLabel(p.datum.week)}\n${p.datum.kind} ${p.datum.value == null ? 'No data' : formatNumber(p.datum.value, 1)}`
-		}
-	});
-}
-
-export function vo2Chart(rows: Vo2Row[]) {
-	return defineChart({
-		marks: [
-			lineY(rows, {
-				x: 'date',
-				y: 'value',
-				z: 'sport',
-				color: 'sport',
-				strokeWidth: 1.75,
-				points: true
-			})
-		],
-		scales: {
-			x: weekAxis,
-			y: { ...valueAxis, nice: true }
-		},
-		color: { scale: sportColor },
-		theme: chartTheme,
-		tooltip: {
-			use: tooltip,
-			format: (p) => `${longDate(p.datum.date)}\n${sportLabel(p.datum.sport)} ${p.datum.value}`
-		}
-	});
-}
-
-const POWER_TICKS = [1, 5, 30, 60, 300, 1200, 3600, 7200];
-
-export function durationLabel(seconds: number) {
-	if (seconds < 60) return `${seconds}s`;
-	if (seconds < 3600) return `${seconds / 60}m`;
-	return `${seconds / 3600}h`;
-}
-
-export function powerChart(rows: PowerRow[]) {
-	return defineChart({
-		marks: [
-			lineY(rows, { x: 'seconds', y: 'watts', stroke: ACCENT, strokeWidth: 1.75, points: true })
-		],
-		scales: {
-			x: {
-				scale: scaleLog().domain([1, 7200]),
-				grid: true,
-				axis: { line: false, ticks: { values: POWER_TICKS, size: 0, format: durationLabel } }
-			},
-			y: { ...valueAxis, nice: true }
-		},
-		theme: chartTheme,
-		tooltip: {
-			use: tooltip,
-			format: (p) =>
-				`${durationLabel(p.datum.seconds)}\n${formatNumber(p.datum.watts)} W\n${formatLongDate(p.datum.date)}`
 		}
 	});
 }

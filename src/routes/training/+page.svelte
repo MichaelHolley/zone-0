@@ -1,9 +1,7 @@
 <script lang="ts">
 	import Section from '#lib/components/Section.svelte';
 	import IntensityLoad from '#lib/components/training/IntensityLoad.svelte';
-	import PowerCurve from '#lib/components/training/PowerCurve.svelte';
 	import RunningBests from '#lib/components/training/RunningBests.svelte';
-	import Vo2Max from '#lib/components/training/Vo2Max.svelte';
 	import WeeklyVolume from '#lib/components/training/WeeklyVolume.svelte';
 	import { getProfile } from '#lib/remote/profile.remote.js';
 
@@ -30,21 +28,7 @@
 		<IntensityLoad />
 	</Section>
 
-	<Section title="VO2max" skeletonHeight={280}>
-		<Vo2Max />
+	<Section title="Running bests" skeletonHeight={280}>
+		<RunningBests system={profile.measurementSystem} />
 	</Section>
-
-	<div class="grid gap-10 lg:grid-cols-2">
-		<Section title="Running bests" skeletonHeight={280}>
-			<RunningBests system={profile.measurementSystem} />
-		</Section>
-
-		<Section
-			title="Cycling power curve"
-			description="Best average power by duration"
-			skeletonHeight={320}
-		>
-			<PowerCurve />
-		</Section>
-	</div>
 </div>

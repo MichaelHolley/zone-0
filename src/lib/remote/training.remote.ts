@@ -14,7 +14,6 @@ import { getToday } from '#lib/server/garmin/settings.js';
 import { SPORTS } from '#lib/sport.js';
 
 const HR_ZONES = [1, 2, 3, 4, 5] as const;
-const POWER_DURATIONS = [1, 2, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200] as const;
 const RUNNING_BESTS = [
 	{ meters: 1000, label: '1 km' },
 	{ meters: 1609, label: '1 mile' },
@@ -114,17 +113,6 @@ export const getIntensityAndLoad = query(async () => {
 	};
 });
 
-export const getVo2Max = query(async () => {
-	const { activities } = await lastYear();
-	return activities
-		.flatMap((a) => {
-			const sport = sportOf(a);
-			if ((sport !== 'running' && sport !== 'cycling') || !a.vO2MaxValue) return [];
-			return [{ date: utcDate(activityDate(a)), sport, value: a.vO2MaxValue }];
-		})
-		.toSorted((a, b) => a.date.getTime() - b.date.getTime());
-});
-
 export const getRunningBests = query(async () => {
 	const { activities } = await lastYear();
 	const runs = activities.filter((a) => sportOf(a) === 'running');
@@ -138,23 +126,5 @@ export const getRunningBests = query(async () => {
 			}
 		}
 		return best ? [{ meters, label, ...best }] : [];
-	});
-});
-
-export const getPowerCurve = query(async () => {
-	const { activities } = await lastYear();
-	const rides = activities.filter(
-		(a) => sportOf(a) === 'cycling' && !a.excludeFromPowerCurveReports
-	);
-
-	return POWER_DURATIONS.flatMap((seconds) => {
-		let best: { watts: number; date: IsoDate } | null = null;
-		for (const ride of rides) {
-			const watts = ride[`maxAvgPower_${seconds}`];
-			if (watts && watts > 0 && (!best || watts > best.watts)) {
-				best = { watts, date: activityDate(ride) };
-			}
-		}
-		return best ? [{ seconds, ...best }] : [];
 	});
 });
