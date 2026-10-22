@@ -9,8 +9,8 @@ export const SPORT_LABEL: Record<Sport, string> = {
 };
 
 export const SPORT_COLOR: Record<Sport, string> = {
-	running: 'var(--color-running)',
-	cycling: 'var(--color-cycling)',
-	strength: 'var(--color-strength)',
-	other: 'var(--color-other)'
+	running: '#ea580c',
+	cycling: '#2563eb',
+	strength: '#be185d',
+	other: '#a1a1aa'
 };
