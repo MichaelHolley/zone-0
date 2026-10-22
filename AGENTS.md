@@ -40,6 +40,10 @@ Validate your changes with `pnpm run check`.
 
 This is a template for vibe projects - you must not write any tests.
 
+## README
+
+Keep `README.md` in sync when a change alters what the app shows, how it works, or how to set it up. Update only the affected lines, keep it short, and don't turn it into a changelog or feature catalogue.
+
 ## Documentation
 
 - Only add a comment when complexity is genuinely high **and** the naming does not already convey enough information.
