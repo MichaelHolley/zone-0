@@ -8,6 +8,8 @@
 
 The user's sports, in order of priority: Strength Training (Gym), Cycling, Running. Weigh features, charts and data coverage accordingly.
 
+Strength training is the main focus, but the user does not use Garmin's strength tracking features (exercise sets, reps, weights). They treat the watch as a running timer that logs heart rate only, so expect duration and heart rate data for strength activities, nothing exercise-level.
+
 ## Garmin API
 
 The project integrates with the free Garmin Connect Personal API (personal use).

@@ -1,4 +1,5 @@
 import { barY, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
+import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { scaleUtc } from 'd3-scale';
@@ -25,15 +26,18 @@ import {
 import type {
 	getCycling,
 	getIntensityAndLoad,
+	getStrength,
 	getWeeklyVolume
 } from '#lib/remote/training.remote.js';
-import { SPORTS, type Sport } from '#lib/sport.js';
+import { SPORT_COLOR, SPORTS, type Sport } from '#lib/sport.js';
 
 type Resolved<T extends (...args: never[]) => Promise<unknown>> = Awaited<ReturnType<T>>;
 type VolumeWeek = Resolved<typeof getWeeklyVolume>[number];
 type Intensity = Resolved<typeof getIntensityAndLoad>;
 type Cycling = Resolved<typeof getCycling>;
 export type Ride = Cycling['rides'][number];
+type Strength = Resolved<typeof getStrength>;
+export type StrengthSession = Strength['sessions'][number];
 
 const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const monthTick = (value: Date) => monthFormat.format(value);
@@ -266,4 +270,82 @@ export function speedChart(rides: Ride[], system: MeasurementSystem) {
 				`${longDate(p.datum.date)}\n${p.datum.kind} ${formatNumber(p.datum.speed, 1)} ${unit}`
 		}
 	});
+}
+
+const TREND_WINDOW = 10;
+
+export function sessionTrendChart(
+	sessions: StrengthSession[],
+	pick: (session: StrengthSession) => number | null,
+	unit: string
+) {
+	const points = sessions.flatMap((session) => {
+		const value = pick(session);
+		return value == null ? [] : [{ date: utcDate(session.date), value }];
+	});
+	const rows = points.map((point, index) => {
+		const recent = points.slice(Math.max(0, index - TREND_WINDOW + 1), index + 1);
+		return { ...point, average: recent.reduce((s, p) => s + p.value, 0) / recent.length };
+	});
+	const color = SPORT_COLOR.strength;
+	return defineChart({
+		marks: [
+			dot(rows, { x: 'date', y: 'value', fill: color, fillOpacity: 0.3, r: 3 }),
+			lineY(rows, { x: 'date', y: 'average', stroke: color, strokeWidth: 2 })
+		],
+		scales: { x: weekAxis, y: { ...valueAxis, nice: true } },
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: (p) =>
+				`${longDate(p.datum.date)}\n${formatNumber(p.datum.value)} ${unit}\n${formatNumber(p.datum.average)} ${unit} ${TREND_WINDOW}-session average`
+		}
+	});
+}
+
+type CategoryBar = { label: string; value: number; color: string; detail: string };
+
+function categoryChart(bars: CategoryBar[]) {
+	return defineChart({
+		marks: [barY(bars, { x: 'label', y: 'value', color: 'label', radius: { end: 2 } })],
+		scales: {
+			x: {
+				scale: () =>
+					scaleBand<string>()
+						.domain(bars.map((bar) => bar.label))
+						.padding(0.16),
+				axis: { line: false, ticks: { size: 0 } }
+			},
+			y: valueAxis
+		},
+		color: { domain: bars.map((bar) => bar.label), range: bars.map((bar) => bar.color) },
+		theme: chartTheme,
+		tooltip: { use: tooltip, format: (p) => `${p.datum.label}\n${p.datum.detail}` }
+	});
+}
+
+export function weekdayChart(rows: Strength['weekdays']) {
+	return categoryChart(
+		rows.map(({ label, count }) => ({
+			label,
+			value: count,
+			color: SPORT_COLOR.strength,
+			detail: `${formatNumber(count)} ${count === 1 ? 'session' : 'sessions'}`
+		}))
+	);
+}
+
+export function zoneShareChart(rows: Strength['zones']) {
+	const total = rows.reduce((sum, row) => sum + row.seconds, 0);
+	return categoryChart(
+		rows.map(({ zone, seconds }) => {
+			const share = total > 0 ? (seconds / total) * 100 : 0;
+			return {
+				label: ZONES[zone - 1].label,
+				value: share,
+				color: ZONES[zone - 1].color,
+				detail: `${formatNumber(share)}% (${formatHoursMinutes(seconds)})`
+			};
+		})
+	);
 }

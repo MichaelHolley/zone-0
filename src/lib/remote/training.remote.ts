@@ -17,6 +17,7 @@ const rideKind = (typeKey = '') =>
 	typeKey.includes('indoor') ? 'Indoor' : typeKey.includes('gravel') ? 'Gravel' : 'Road';
 
 const HR_ZONES = [1, 2, 3, 4, 5] as const;
+const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 const RUNNING_BESTS = [
 	{ meters: 1000, label: '1 km' },
 	{ meters: 1609, label: '1 mile' },
@@ -130,6 +131,66 @@ export const getRunningBests = query(async () => {
 		}
 		return best ? [{ meters, label, ...best }] : [];
 	});
+});
+
+export const getStrength = query(async () => {
+	const { activities, weeks, weekOf, settings } = await lastYear();
+	const sessions = activities.filter((a) => sportOf(a) === 'strength');
+	const byWeek = groupByWeek(sessions, weekOf);
+
+	let activeWeeks = 0;
+	let longestStreak = 0;
+	let streak = 0;
+	for (const week of weeks) {
+		if (byWeek.has(week)) {
+			activeWeeks++;
+			streak++;
+			longestStreak = Math.max(longestStreak, streak);
+		} else {
+			streak = 0;
+		}
+	}
+
+	return {
+		consistency: { activeWeeks, totalWeeks: weeks.length, longestStreak },
+		weekdays: Array.from({ length: 7 }, (_, offset) => {
+			const day = (settings.firstDayOfWeek + offset) % 7;
+			return {
+				label: WEEKDAY_LABELS[day],
+				count: sessions.filter((a) => utcDate(activityDate(a)).getUTCDay() === day).length
+			};
+		}),
+		zones: HR_ZONES.map((zone) => ({
+			zone,
+			seconds: sum(sessions.map((a) => a[`hrTimeInZone_${zone}`] ?? 0))
+		})),
+		sessions: sessions
+			.map((a) => ({
+				date: activityDate(a),
+				duration: a.duration ?? 0,
+				heartRate: a.averageHR ?? null,
+				maxHeartRate: a.maxHR ?? null,
+				calories: a.calories ?? null,
+				aerobicEffect: a.aerobicTrainingEffect ?? null,
+				anaerobicEffect: a.anaerobicTrainingEffect ?? null
+			}))
+			.toSorted((a, b) => a.date.localeCompare(b.date))
+	};
+});
+
+export const getRunning = query(async () => {
+	const { activities } = await lastYear();
+	return activities
+		.filter((a) => sportOf(a) === 'running')
+		.map((a) => ({
+			date: activityDate(a),
+			kind: a.activityType?.typeKey?.includes('treadmill') ? 'Treadmill' : 'Outdoor',
+			distance: a.distance ?? 0,
+			movingSeconds: a.movingDuration ?? a.duration ?? 0,
+			heartRate: a.averageHR ?? null,
+			cadence: a.averageRunningCadenceInStepsPerMinute ?? null
+		}))
+		.toSorted((a, b) => a.date.localeCompare(b.date));
 });
 
 export const getCycling = query(async () => {

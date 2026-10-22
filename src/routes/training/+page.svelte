@@ -2,7 +2,8 @@
 	import Section from '#lib/components/Section.svelte';
 	import Cycling from '#lib/components/training/Cycling.svelte';
 	import IntensityLoad from '#lib/components/training/IntensityLoad.svelte';
-	import RunningBests from '#lib/components/training/RunningBests.svelte';
+	import Running from '#lib/components/training/Running.svelte';
+	import Strength from '#lib/components/training/Strength.svelte';
 	import WeeklyVolume from '#lib/components/training/WeeklyVolume.svelte';
 	import { getProfile } from '#lib/remote/profile.remote.js';
 
@@ -29,11 +30,19 @@
 		<IntensityLoad />
 	</Section>
 
+	<Section
+		title="Strength"
+		description="Line: average of the last 10 sessions"
+		skeletonHeight={900}
+	>
+		<Strength />
+	</Section>
+
 	<Section title="Cycling" skeletonHeight={520}>
 		<Cycling system={profile.measurementSystem} />
 	</Section>
 
-	<Section title="Running bests" skeletonHeight={280}>
-		<RunningBests system={profile.measurementSystem} />
+	<Section title="Running" skeletonHeight={480}>
+		<Running system={profile.measurementSystem} />
 	</Section>
 </div>

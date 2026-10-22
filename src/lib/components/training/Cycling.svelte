@@ -3,6 +3,7 @@
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import Legend from '#lib/components/Legend.svelte';
 	import Panel from '#lib/components/Panel.svelte';
+	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import {
 		elevationUnit,
@@ -19,6 +20,15 @@
 	import { RIDE_KINDS, elevationChart, speedChart, type Ride } from './charts.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
+
+	const columns = [
+		{ label: 'Date' },
+		{ label: 'Type' },
+		{ label: 'Distance', end: true },
+		{ label: 'Climb', end: true },
+		{ label: 'Avg speed', end: true },
+		{ label: 'Avg HR', end: true }
+	];
 
 	const data = $derived(await getCycling());
 	const total = (pick: (ride: Ride) => number) =>
@@ -81,44 +91,31 @@
 		</Panel>
 	</div>
 
-	<div class="mt-3 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-		<table class="w-full text-sm">
-			<caption class="px-4 pt-3 pb-2 text-left text-xs text-zinc-500">Longest rides</caption>
-			<thead>
-				<tr class="border-b border-zinc-200 text-left text-xs text-zinc-500">
-					<th scope="col" class="px-4 py-2.5 font-normal">Date</th>
-					<th scope="col" class="px-4 py-2.5 font-normal">Type</th>
-					<th scope="col" class="px-4 py-2.5 text-right font-normal">Distance</th>
-					<th scope="col" class="px-4 py-2.5 text-right font-normal">Climb</th>
-					<th scope="col" class="px-4 py-2.5 text-right font-normal">Avg speed</th>
-					<th scope="col" class="px-4 py-2.5 text-right font-normal">Avg HR</th>
+	<div class="mt-3">
+		<Table caption="Longest rides" {columns}>
+			{#each longest as ride (ride.date + ride.distance)}
+				<tr>
+					<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
+						{formatLongDate(ride.date)}
+					</th>
+					<td class="px-4 py-3 text-zinc-500">{ride.kind}</td>
+					<td class="px-4 py-3 text-right font-mono tabular-nums">
+						{formatDistance(ride.distance, system)}
+					</td>
+					<td class="px-4 py-3 text-right font-mono tabular-nums">
+						{formatNumber(toElevation(ride.elevation, system))}
+						{elevationUnit(system)}
+					</td>
+					<td class="px-4 py-3 text-right font-mono tabular-nums">
+						{ride.speed == null
+							? '-'
+							: `${formatNumber(toSpeed(ride.speed, system), 1)} ${speedUnit(system)}`}
+					</td>
+					<td class="px-4 py-3 text-right font-mono tabular-nums">
+						{ride.heartRate == null ? '-' : `${formatNumber(ride.heartRate)} bpm`}
+					</td>
 				</tr>
-			</thead>
-			<tbody class="divide-y divide-zinc-100">
-				{#each longest as ride (ride.date + ride.distance)}
-					<tr>
-						<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
-							{formatLongDate(ride.date)}
-						</th>
-						<td class="px-4 py-3 text-zinc-500">{ride.kind}</td>
-						<td class="px-4 py-3 text-right font-mono tabular-nums">
-							{formatDistance(ride.distance, system)}
-						</td>
-						<td class="px-4 py-3 text-right font-mono tabular-nums">
-							{formatNumber(toElevation(ride.elevation, system))}
-							{elevationUnit(system)}
-						</td>
-						<td class="px-4 py-3 text-right font-mono tabular-nums">
-							{ride.speed == null
-								? '-'
-								: `${formatNumber(toSpeed(ride.speed, system), 1)} ${speedUnit(system)}`}
-						</td>
-						<td class="px-4 py-3 text-right font-mono tabular-nums">
-							{ride.heartRate == null ? '-' : `${formatNumber(ride.heartRate)} bpm`}
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+			{/each}
+		</Table>
 	</div>
 {/if}
