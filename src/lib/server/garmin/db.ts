@@ -13,7 +13,6 @@ export function database(): DatabaseSync {
 		CREATE TABLE IF NOT EXISTS activities (
 			activityId INTEGER PRIMARY KEY,
 			startTimeLocal TEXT NOT NULL,
-			sport TEXT NOT NULL,
 			json TEXT NOT NULL
 		);
 		CREATE INDEX IF NOT EXISTS activities_startTimeLocal ON activities (startTimeLocal);

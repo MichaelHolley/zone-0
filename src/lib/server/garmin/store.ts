@@ -1,11 +1,6 @@
+import { isKeyError } from '#lib/errors.js';
 import { HOUR, MINUTE } from './cache';
-import {
-	fetchActivities,
-	fetchDailySummaries,
-	sportOf,
-	type Activity,
-	type DailySummary
-} from './data';
+import { fetchActivities, fetchDailySummaries, type Activity, type DailySummary } from './data';
 import { addDays, type IsoDate } from './dates';
 import { database } from './db';
 import { getToday } from './settings';
@@ -16,11 +11,11 @@ const BACKFILL_DAYS = 365;
 /** Re-fetch a few days before the newest stored entry to catch edits and late uploads. */
 const OVERLAP_DAYS = 3;
 
-export type SyncStatus = { syncedAt: number | null; failed: boolean };
+export type SyncStatus = { syncedAt: number | null; error: 'keyRejected' | 'failed' | null };
 
 let pendingSync: Promise<void> | null = null;
 let lastAttemptAt = 0;
-let lastSyncFailed = false;
+let lastSyncError: SyncStatus['error'] = null;
 
 function syncedAt(resource: 'sync' | 'fullSync'): number | null {
 	const row = database()
@@ -70,11 +65,11 @@ async function runSync() {
 				end
 			);
 			const insertActivity = db.prepare(
-				'INSERT OR REPLACE INTO activities (activityId, startTimeLocal, sport, json) VALUES (?, ?, ?, ?)'
+				'INSERT OR REPLACE INTO activities (activityId, startTimeLocal, json) VALUES (?, ?, ?)'
 			);
 			for (const a of activities) {
 				if (a.activityId == null || !a.startTimeLocal) continue;
-				insertActivity.run(a.activityId, a.startTimeLocal, sportOf(a), JSON.stringify(a));
+				insertActivity.run(a.activityId, a.startTimeLocal, JSON.stringify(a));
 			}
 
 			db.prepare('DELETE FROM daily_summaries WHERE calendarDate >= ? AND calendarDate < ?').run(
@@ -94,9 +89,10 @@ async function runSync() {
 			setSyncedAt.run('sync', lastAttemptAt);
 			if (full) setSyncedAt.run('fullSync', lastAttemptAt);
 		});
-		lastSyncFailed = false;
+		lastSyncError = null;
 	} catch (error) {
-		lastSyncFailed = true;
+		lastSyncError = isKeyError(error) ? 'keyRejected' : 'failed';
+		console.error('Garmin sync failed', error);
 		throw error;
 	}
 }
@@ -123,7 +119,7 @@ export async function syncStore(): Promise<boolean> {
 }
 
 export function syncStatus(): SyncStatus {
-	return { syncedAt: syncedAt('sync'), failed: lastSyncFailed };
+	return { syncedAt: syncedAt('sync'), error: lastSyncError };
 }
 
 /** Only the first sync blocks reads; later ones are started by the client after the page renders. */
