@@ -2,15 +2,10 @@ import { query } from '$app/server';
 import { utcDate } from '#lib/format.js';
 import { cached, MINUTE } from '#lib/server/garmin/cache.js';
 import { garmin, unwrap } from '#lib/server/garmin/client.js';
-import {
-	activityDate,
-	fetchActivities,
-	fetchDailySummaries,
-	sportOf,
-	weightedIntensityMinutes
-} from '#lib/server/garmin/data.js';
+import { activityDate, sportOf, weightedIntensityMinutes } from '#lib/server/garmin/data.js';
 import { addDays, weekStart, type IsoDate } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
+import { getActivities, getDailySummaries } from '#lib/server/garmin/store.js';
 import { sum } from '#lib/stats.js';
 
 const TODAY_TTL = 5 * MINUTE;
@@ -43,9 +38,7 @@ export const getVitals = query(async () => {
 
 	const [daily, summaries] = await Promise.all([
 		latestDaily(today),
-		cached(`summaries:${trendStart}:${today}`, TODAY_TTL, () =>
-			fetchDailySummaries(trendStart, today)
-		)
+		getDailySummaries(trendStart, today)
 	]);
 
 	const week = weekStart(today, settings.firstDayOfWeek);
@@ -92,9 +85,7 @@ export const getVitals = query(async () => {
 export const getWeekWorkouts = query(async () => {
 	const { settings, today } = await getToday();
 	const start = weekStart(today, settings.firstDayOfWeek);
-	const activities = await cached(`activities:${start}:${today}`, TODAY_TTL, () =>
-		fetchActivities(start, today)
-	);
+	const activities = await getActivities(start, today);
 
 	return activities
 		.toSorted((a, b) => (b.startTimeLocal ?? '').localeCompare(a.startTimeLocal ?? ''))
