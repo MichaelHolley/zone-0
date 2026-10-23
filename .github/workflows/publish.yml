@@ -23,6 +23,8 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/zone-0:latest
             ${{ vars.DOCKERHUB_USERNAME }}/zone-0:${{ github.sha }}
