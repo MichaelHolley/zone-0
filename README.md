@@ -21,7 +21,7 @@ Units, time zone and the first day of the week come from your Garmin profile set
 Requires Node 24 and pnpm.
 
 1. Create a key on the [Garmin Connect Personal API](https://developer.garmin.com/gc-developer-program/personal/personal-api/) page.
-2. Copy `.env.example` to `.env` and set `GARMIN_API_KEY`. `DATA_DIR` must point to a directory that persists across restarts.
+2. Copy `.env.example` to `.env` and set `GARMIN_API_KEY`. `DATA_DIR` must point to a directory that persists across restarts; the Docker image uses `/data`, so mount a volume there.
 3. Install and run:
 
 ```sh

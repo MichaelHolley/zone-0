@@ -9,6 +9,9 @@ RUN pnpm run build && pnpm prune --prod
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
+ENV DATA_DIR=/data
+RUN mkdir /data && chown node:node /data
+VOLUME /data
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules ./node_modules
 COPY package.json ./
