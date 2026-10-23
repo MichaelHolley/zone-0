@@ -9,23 +9,23 @@
 	] as const;
 </script>
 
-<header class="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
-	<nav class="mx-auto flex h-14 max-w-6xl items-center gap-8 px-4 md:px-8">
-		<a href={resolve('/')} class="font-mono text-sm font-semibold tracking-tight text-zinc-900"
-			>zone-0</a
+<header class="sticky top-0 z-10 border-b border-line bg-white">
+	<nav
+		class="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4 px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:px-8"
+	>
+		<a href={resolve('/')} class="text-xl font-bold tracking-tight text-accent">zone-0</a>
+		<ul
+			class="flex items-center rounded-full border border-line-strong bg-white p-1 text-sm shadow-[0_1px_2px_rgb(0_0_0/0.08),0_4px_12px_rgb(0_0_0/0.05)]"
 		>
-		<ul class="flex h-full items-center gap-6 text-sm">
 			{#each links as link (link.href)}
 				{@const active = page.url.pathname === link.href}
-				<li class="h-full">
+				<li>
 					<a
 						href={link.href}
 						aria-current={active ? 'page' : undefined}
 						class={[
-							'flex h-full items-center border-b-2 transition-colors',
-							active
-								? 'border-accent font-medium text-zinc-900'
-								: 'border-transparent text-zinc-500 hover:text-zinc-900'
+							'block rounded-full px-4 py-2 font-semibold transition-colors',
+							active ? 'bg-ink text-white' : 'text-ash hover:bg-mist hover:text-ink'
 						]}
 					>
 						{link.label}

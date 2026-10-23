@@ -18,14 +18,14 @@
 	} = $props();
 </script>
 
-<article class={['flex flex-col rounded-lg border border-zinc-200 bg-white p-4', className]}>
-	<h3 class="text-sm text-zinc-500">{label}</h3>
-	<p class="mt-2 flex items-baseline gap-1.5">
-		<span class="font-mono text-3xl font-medium tracking-tight tabular-nums">{value}</span>
-		{#if unit}<span class="text-sm text-zinc-500">{unit}</span>{/if}
+<article class={['flex flex-col rounded-2xl bg-mist p-5', className]}>
+	<h3 class="text-sm font-medium text-ash">{label}</h3>
+	<p class="mt-1.5 flex items-baseline gap-1.5">
+		<span class="text-[2rem] leading-tight font-semibold tracking-tight tabular-nums">{value}</span>
+		{#if unit}<span class="text-sm font-medium text-ash">{unit}</span>{/if}
 	</p>
 	{#if detail}
-		<div class="mt-1 text-xs text-zinc-500">{@render detail()}</div>
+		<div class="mt-1 text-[13px] leading-snug text-ash">{@render detail()}</div>
 	{/if}
 	{#if children}
 		<div class="mt-auto pt-4">{@render children()}</div>

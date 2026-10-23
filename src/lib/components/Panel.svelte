@@ -9,10 +9,10 @@
 	}: { title?: string; aside?: Snippet; children: Snippet; class?: string } = $props();
 </script>
 
-<article class={['rounded-lg border border-zinc-200 bg-white p-4', className]}>
+<article class={['rounded-2xl border border-line bg-white p-5', className]}>
 	{#if title || aside}
-		<header class="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-			{#if title}<h3 class="text-sm text-zinc-500">{title}</h3>{/if}
+		<header class="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+			{#if title}<h3 class="text-[15px] font-semibold">{title}</h3>{/if}
 			{#if aside}{@render aside()}{/if}
 		</header>
 	{/if}

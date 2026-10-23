@@ -35,30 +35,30 @@
 	</div>
 
 	{#if fitnessAge.components.length > 0}
-		<div class="mt-3 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+		<div class="mt-3 overflow-x-auto rounded-2xl border border-line bg-white">
 			<table class="w-full text-sm">
 				<thead>
-					<tr class="border-b border-zinc-200 text-left text-xs text-zinc-500">
-						<th scope="col" class="px-4 py-2.5 font-normal">Factor</th>
-						<th scope="col" class="px-4 py-2.5 text-right font-normal">Current</th>
-						<th scope="col" class="px-4 py-2.5 text-right font-normal">Target</th>
-						<th scope="col" class="px-4 py-2.5 text-right font-normal">Age at target</th>
+					<tr class="border-b border-line text-left text-[13px] text-ash">
+						<th scope="col" class="px-5 py-3 font-medium">Factor</th>
+						<th scope="col" class="px-5 py-3 text-right font-medium">Current</th>
+						<th scope="col" class="px-5 py-3 text-right font-medium">Target</th>
+						<th scope="col" class="px-5 py-3 text-right font-medium">Age at target</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-zinc-100">
+				<tbody class="divide-y divide-line">
 					{#each fitnessAge.components as component (component.label)}
 						<tr>
-							<th scope="row" class="px-4 py-3 text-left font-medium">{component.label}</th>
-							<td class="px-4 py-3 text-right font-mono tabular-nums">
+							<th scope="row" class="px-5 py-3.5 text-left font-medium">{component.label}</th>
+							<td class="px-5 py-3.5 text-right tabular-nums">
 								{formatNumber(component.value, 1)}
 								{component.unit}
 							</td>
-							<td class="px-4 py-3 text-right font-mono tabular-nums">
+							<td class="px-5 py-3.5 text-right tabular-nums">
 								{component.target == null
 									? '-'
 									: `${formatNumber(component.target, 1)} ${component.unit}`}
 							</td>
-							<td class="px-4 py-3 text-right font-mono tabular-nums">
+							<td class="px-5 py-3.5 text-right tabular-nums">
 								{component.potentialAge == null ? '-' : formatNumber(component.potentialAge, 1)}
 							</td>
 						</tr>

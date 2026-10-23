@@ -13,28 +13,30 @@
 <div class="max-w-xl pt-8">
 	{#if keyError}
 		<KeyIcon size={28} class="text-accent-ink" />
-		<h1 class="mt-4 text-2xl font-semibold tracking-tight">Garmin rejected your API key</h1>
-		<p class="mt-3 leading-relaxed text-zinc-600">
-			The key in <code class="font-mono text-sm">GARMIN_API_KEY</code> is invalid or has expired. Create
-			a new key in Garmin Connect, update your environment and restart the server.
+		<h1 class="mt-4 text-[2rem] leading-tight font-bold tracking-tight">
+			Garmin rejected your API key
+		</h1>
+		<p class="mt-3 leading-relaxed text-ash">
+			The key in <code class="text-sm">GARMIN_API_KEY</code> is invalid or has expired. Create a new key
+			in Garmin Connect, update your environment and restart the server.
 		</p>
 		<a
 			href="https://connect.garmin.com/app/settings/personalApiToken"
 			target="_blank"
 			rel="noreferrer"
-			class="mt-6 inline-flex items-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-zinc-800 active:translate-y-px"
+			class="mt-6 inline-flex items-center rounded-lg bg-accent px-6 py-3 font-semibold text-white transition hover:bg-accent-ink active:scale-[0.98]"
 		>
 			Open Garmin API keys
 		</a>
 	{:else}
 		<WarningCircleIcon size={28} class="text-red-600" />
-		<h1 class="mt-4 text-2xl font-semibold tracking-tight">
+		<h1 class="mt-4 text-[2rem] leading-tight font-bold tracking-tight">
 			{page.status === 404 ? 'Page not found' : 'Something went wrong'}
 		</h1>
-		<p class="mt-3 leading-relaxed text-zinc-600">{errorMessage(page.error)}</p>
+		<p class="mt-3 leading-relaxed text-ash">{errorMessage(page.error)}</p>
 		<a
 			href={resolve('/')}
-			class="mt-6 inline-block text-sm font-medium text-accent-ink underline underline-offset-2"
+			class="mt-6 inline-block font-semibold text-ink underline underline-offset-2"
 		>
 			Back to today
 		</a>

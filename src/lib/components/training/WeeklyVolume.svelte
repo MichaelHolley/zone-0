@@ -29,17 +29,17 @@
 
 <Panel>
 	<div class="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-		<div role="group" aria-label="Volume metric" class="inline-flex rounded-md bg-zinc-100 p-0.5">
+		<div role="group" aria-label="Volume metric" class="flex flex-wrap gap-2">
 			{#each METRICS as option (option)}
 				<button
 					type="button"
 					aria-pressed={metric === option}
 					onclick={() => (metric = option)}
 					class={[
-						'rounded px-2.5 py-1 text-xs font-medium transition-colors active:translate-y-px',
+						'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors active:scale-[0.97]',
 						metric === option
-							? 'bg-white text-zinc-900 shadow-sm'
-							: 'text-zinc-500 hover:text-zinc-900'
+							? 'border-ink bg-ink text-white'
+							: 'border-line-strong text-ink hover:border-ink'
 					]}
 				>
 					{METRIC_LABEL[option]}

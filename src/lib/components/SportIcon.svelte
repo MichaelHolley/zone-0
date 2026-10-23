@@ -17,9 +17,9 @@
 </script>
 
 <span
-	class="inline-flex size-7 shrink-0 items-center justify-center rounded-md"
+	class="inline-flex size-9 shrink-0 items-center justify-center rounded-full"
 	style:color={SPORT_COLOR[sport]}
-	style:background-color="{SPORT_COLOR[sport]}14"
+	style:background-color="{SPORT_COLOR[sport]}1a"
 	title={SPORT_LABEL[sport]}
 >
 	<Icon {size} weight="bold" />

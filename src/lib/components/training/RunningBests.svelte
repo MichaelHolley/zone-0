@@ -24,12 +24,12 @@
 	<Table caption="Best efforts" {columns}>
 		{#each bests as best (best.meters)}
 			<tr>
-				<th scope="row" class="px-4 py-3 text-left font-medium">{best.label}</th>
-				<td class="px-4 py-3 text-right font-mono tabular-nums">{formatClock(best.seconds)}</td>
-				<td class="px-4 py-3 text-right font-mono tabular-nums">
+				<th scope="row" class="px-5 py-3.5 text-left font-medium">{best.label}</th>
+				<td class="px-5 py-3.5 text-right tabular-nums">{formatClock(best.seconds)}</td>
+				<td class="px-5 py-3.5 text-right tabular-nums">
 					{formatPace(best.seconds, best.meters, system)}
 				</td>
-				<td class="px-4 py-3 text-right whitespace-nowrap text-zinc-500">
+				<td class="px-5 py-3.5 text-right whitespace-nowrap text-ash">
 					{formatLongDate(best.date)}
 				</td>
 			</tr>

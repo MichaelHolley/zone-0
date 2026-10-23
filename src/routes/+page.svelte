@@ -10,12 +10,12 @@
 
 <svelte:head><title>Today | zone-0</title></svelte:head>
 
-<header class="mb-8">
-	<h1 class="text-2xl font-semibold tracking-tight">Today</h1>
-	<p class="mt-1 text-sm text-zinc-500">{formatLongDate(profile.today)}</p>
+<header class="mb-10">
+	<h1 class="text-[2rem] leading-tight font-bold tracking-tight">Today</h1>
+	<p class="mt-1 text-base text-ash">{formatLongDate(profile.today)}</p>
 </header>
 
-<div class="space-y-10">
+<div class="space-y-14">
 	<Section
 		title="Vitals"
 		description="Today's values with the last 4 weeks below"

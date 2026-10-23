@@ -9,12 +9,12 @@
 
 <svelte:head><title>Body | zone-0</title></svelte:head>
 
-<header class="mb-8">
-	<h1 class="text-2xl font-semibold tracking-tight">Body</h1>
-	<p class="mt-1 text-sm text-zinc-500">Last 12 months</p>
+<header class="mb-10">
+	<h1 class="text-[2rem] leading-tight font-bold tracking-tight">Body</h1>
+	<p class="mt-1 text-base text-ash">Last 12 months</p>
 </header>
 
-<div class="space-y-10">
+<div class="space-y-14">
 	<Section skeletonHeight={480}>
 		<WeightOverview system={profile.measurementSystem} />
 	</Section>

@@ -122,7 +122,7 @@ export function volumeChart(rows: VolumeRow[], metric: VolumeMetric, system: Mea
 }
 
 export const ZONES = [
-	{ zone: 1, label: 'Zone 1', color: '#d4d4d8' },
+	{ zone: 1, label: 'Zone 1', color: '#dddddd' },
 	{ zone: 2, label: 'Zone 2', color: '#60a5fa' },
 	{ zone: 3, label: 'Zone 3', color: '#4ade80' },
 	{ zone: 4, label: 'Zone 4', color: '#fb923c' },
@@ -131,7 +131,7 @@ export const ZONES = [
 
 export const EFFECTS = [
 	{ label: 'Aerobic', color: ACCENT },
-	{ label: 'Anaerobic', color: '#3f3f46' }
+	{ label: 'Anaerobic', color: '#222222' }
 ] as const;
 
 export const formatHoursMinutes = (seconds: number) => {

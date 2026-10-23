@@ -104,25 +104,25 @@
 		<Table caption="Hardest sessions by training effect" {columns}>
 			{#each hardest as session (session.date + session.duration)}
 				<tr>
-					<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
+					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
 						{formatLongDate(session.date)}
 					</th>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{formatDuration(session.duration)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{session.heartRate == null ? '-' : `${formatNumber(session.heartRate)} bpm`}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{session.maxHeartRate == null ? '-' : `${formatNumber(session.maxHeartRate)} bpm`}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{session.aerobicEffect == null ? '-' : formatNumber(session.aerobicEffect, 1)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{session.anaerobicEffect == null ? '-' : formatNumber(session.anaerobicEffect, 1)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{session.calories == null ? '-' : formatNumber(session.calories)}
 					</td>
 				</tr>

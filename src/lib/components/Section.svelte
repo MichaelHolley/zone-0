@@ -24,9 +24,9 @@
 
 <section class={className}>
 	{#if title}
-		<header class="mb-3">
-			<h2 class="text-sm font-medium text-zinc-900">{title}</h2>
-			{#if description}<p class="mt-0.5 text-xs text-zinc-500">{description}</p>{/if}
+		<header class="mb-5">
+			<h2 class="text-[22px] leading-tight font-semibold tracking-tight">{title}</h2>
+			{#if description}<p class="mt-1 text-[15px] text-ash">{description}</p>{/if}
 		</header>
 	{/if}
 	<svelte:boundary onerror={rethrowKeyError}>
@@ -34,14 +34,14 @@
 
 		{#snippet pending()}
 			<div
-				class="animate-pulse rounded-lg border border-zinc-200 bg-zinc-100/70 motion-reduce:animate-none"
+				class="animate-pulse rounded-2xl bg-mist motion-reduce:animate-none"
 				style:height="{skeletonHeight}px"
 			></div>
 		{/snippet}
 
 		{#snippet failed(error, reset)}
 			<div
-				class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 p-4 text-sm text-red-900"
+				class="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/60 p-5 text-sm text-red-900"
 			>
 				<WarningCircleIcon size={18} class="mt-0.5 shrink-0" />
 				<div>
@@ -49,7 +49,7 @@
 					<button
 						type="button"
 						onclick={reset}
-						class="mt-2 font-medium underline underline-offset-2 active:translate-y-px"
+						class="mt-2 font-semibold underline underline-offset-2 active:translate-y-px"
 					>
 						Try again
 					</button>

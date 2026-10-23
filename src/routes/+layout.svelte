@@ -9,6 +9,6 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 <Nav />
-<main class="mx-auto max-w-6xl px-4 pt-8 pb-16 md:px-8">
+<main class="mx-auto max-w-6xl px-4 pt-10 pb-20 md:px-8">
 	{@render children()}
 </main>

@@ -26,7 +26,7 @@
 </script>
 
 {#if vitals.date !== today}
-	<p class="mb-3 text-sm text-zinc-500">
+	<p class="mb-3 text-sm text-ash">
 		Nothing synced today yet. Showing {formatLongDate(vitals.date)}.
 	</p>
 {/if}
@@ -41,7 +41,7 @@
 		{#snippet detail()}
 			7-day avg {show(vitals.restingHr.sevenDayAvg)} bpm
 			{#if restingDelta != null && restingDelta !== 0}
-				<span class={restingDelta > 0 ? 'text-orange-700' : 'text-accent-ink'}>
+				<span class={restingDelta > 0 ? 'text-accent-ink' : 'text-good'}>
 					({signed(restingDelta)})
 				</span>
 			{/if}

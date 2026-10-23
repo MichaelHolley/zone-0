@@ -103,23 +103,23 @@
 		<Table caption="Longest rides" {columns}>
 			{#each longest as ride (ride.date + ride.distance)}
 				<tr>
-					<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
+					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
 						{formatLongDate(ride.date)}
 					</th>
-					<td class="px-4 py-3 text-zinc-500">{ride.kind}</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-ash">{ride.kind}</td>
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{formatDistance(ride.distance, system)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{formatNumber(toElevation(ride.elevation, system))}
 						{elevationUnit(system)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{ride.speed == null
 							? '-'
 							: `${formatNumber(toSpeed(ride.speed, system), 1)} ${speedUnit(system)}`}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{ride.heartRate == null ? '-' : `${formatNumber(ride.heartRate)} bpm`}
 					</td>
 				</tr>

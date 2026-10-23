@@ -63,23 +63,23 @@
 		<Table caption="Recent runs" {columns}>
 			{#each recent as run (run.date + run.distance)}
 				<tr>
-					<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
+					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
 						{formatLongDate(run.date)}
 					</th>
-					<td class="px-4 py-3 text-zinc-500">{run.kind}</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-ash">{run.kind}</td>
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{formatDistance(run.distance, system)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{formatDuration(run.movingSeconds)}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{run.distance > 0 ? formatPace(run.movingSeconds, run.distance, system) : '-'}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{run.heartRate == null ? '-' : `${formatNumber(run.heartRate)} bpm`}
 					</td>
-					<td class="px-4 py-3 text-right font-mono tabular-nums">
+					<td class="px-5 py-3.5 text-right tabular-nums">
 						{run.cadence == null ? '-' : `${formatNumber(run.cadence)} spm`}
 					</td>
 				</tr>

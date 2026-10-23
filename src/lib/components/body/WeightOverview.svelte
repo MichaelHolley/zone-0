@@ -93,8 +93,8 @@
 	<Panel title="Weight ({unit})" class="mt-3">
 		{#snippet aside()}
 			{#if goal != null}
-				<p class="flex items-center gap-2 text-xs text-zinc-500">
-					<span class="w-5 border-t border-dashed border-zinc-500"></span>
+				<p class="flex items-center gap-2 text-[13px] text-ash">
+					<span class="w-5 border-t border-dashed border-ash"></span>
 					Goal {formatNumber(goal, 1)}
 					{unit}
 				</p>

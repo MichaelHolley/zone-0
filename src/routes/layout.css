@@ -1,24 +1,32 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/geist';
-@import '@fontsource-variable/geist-mono';
+@import '@fontsource-variable/figtree';
 
 @theme {
-	--font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-	--font-mono: 'Geist Mono Variable', ui-monospace, monospace;
-	--color-accent: #0d9488;
-	--color-accent-ink: #0f766e;
+	--font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
+	--color-ink: #222222;
+	--color-ash: #6a6a6a;
+	--color-line: #ebebeb;
+	--color-line-strong: #dddddd;
+	--color-mist: #f7f7f7;
+	--color-accent: #ff385c;
+	--color-accent-ink: #d70466;
+	--color-good: #008a05;
 }
 
 :root {
 	color-scheme: light;
 	--ts-chart-tooltip-background: #ffffff;
-	--ts-chart-tooltip-color: #18181b;
-	--ts-chart-tooltip-border: 1px solid #e4e4e7;
-	--ts-chart-tooltip-border-radius: 6px;
-	--ts-chart-tooltip-shadow: 0 4px 16px rgb(24 24 27 / 0.06);
-	--ts-chart-tooltip-font: 12px/1.4 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+	--ts-chart-tooltip-color: #222222;
+	--ts-chart-tooltip-border: none;
+	--ts-chart-tooltip-border-radius: 12px;
+	--ts-chart-tooltip-shadow: 0 6px 20px rgb(0 0 0 / 0.15);
+	--ts-chart-tooltip-font: 500 13px/1.45 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-	@apply bg-zinc-50 font-sans text-zinc-900 antialiased;
+	@apply bg-white font-sans text-ink antialiased;
+}
+
+:focus-visible {
+	@apply outline-2 outline-offset-2 outline-ink;
 }
