@@ -102,28 +102,37 @@ async function runSync() {
 }
 
 /**
- * Syncs with Garmin when the store is stale. Failures are retried after the same
- * threshold and only throw while the store is still empty, so pages keep showing stored data.
+ * Syncs with Garmin when the store is stale and resolves to whether new data was stored.
+ * Failures are retried after the same threshold and only throw while the store is still empty.
  */
-export async function syncStore(): Promise<SyncStatus> {
+export async function syncStore(): Promise<boolean> {
 	const lastSync = syncedAt('sync');
 	if (lastSync === null || Math.max(lastSync, lastAttemptAt) < Date.now() - STALE_AFTER_MS) {
 		pendingSync ??= runSync().finally(() => {
 			pendingSync = null;
 		});
 	}
-	if (pendingSync) {
-		try {
-			await pendingSync;
-		} catch (error) {
-			if (lastSync === null) throw error;
-		}
+	if (!pendingSync) return false;
+	try {
+		await pendingSync;
+		return true;
+	} catch (error) {
+		if (lastSync === null) throw error;
+		return false;
 	}
+}
+
+export function syncStatus(): SyncStatus {
 	return { syncedAt: syncedAt('sync'), failed: lastSyncFailed };
 }
 
+/** Only the first sync blocks reads; later ones are started by the client after the page renders. */
+async function initialSync() {
+	if (syncedAt('sync') === null) await syncStore();
+}
+
 export async function getActivities(start: IsoDate, end: IsoDate): Promise<Activity[]> {
-	await syncStore();
+	await initialSync();
 	return database()
 		.prepare(
 			'SELECT json FROM activities WHERE startTimeLocal >= ? AND startTimeLocal < ? ORDER BY startTimeLocal'
@@ -133,7 +142,7 @@ export async function getActivities(start: IsoDate, end: IsoDate): Promise<Activ
 }
 
 export async function getDailySummaries(start: IsoDate, end: IsoDate): Promise<DailySummary[]> {
-	await syncStore();
+	await initialSync();
 	return database()
 		.prepare(
 			'SELECT json FROM daily_summaries WHERE calendarDate >= ? AND calendarDate <= ? ORDER BY calendarDate'

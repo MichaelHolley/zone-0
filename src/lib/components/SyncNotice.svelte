@@ -1,10 +1,16 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import WarningCircleIcon from 'phosphor-svelte/lib/WarningCircleIcon';
-	import { getSyncStatus } from '#lib/remote/sync.remote.js';
+	import { STORE_QUERIES } from '#lib/remote/store-queries.js';
+	import { getSyncStatus, syncWithGarmin } from '#lib/remote/sync.remote.js';
 
 	let { timeZone }: { timeZone: string } = $props();
 
 	const status = $derived(await getSyncStatus());
+
+	onMount(() => {
+		void syncWithGarmin().updates(...STORE_QUERIES);
+	});
 </script>
 
 {#if status.failed && status.syncedAt}
