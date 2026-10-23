@@ -11,8 +11,8 @@ Units, time zone and the first day of the week come from your Garmin profile set
 ## How it works
 
 - Built with SvelteKit (Svelte 5 runes, async components, remote functions), TypeScript and Tailwind CSS. Charts use TanStack Charts with `d3-scale`.
-- Data is fetched live from Garmin in server-side remote functions (`src/lib/remote`) and aggregated into chart-ready arrays on the server. There is no database.
-- Responses are kept in an in-memory cache: about 5 minutes for today's data and 1 hour for history and profile settings.
+- Activities and daily summaries are synced from Garmin into a local SQLite file (`node:sqlite`, `src/lib/server/garmin/store.ts`) under `DATA_DIR` (default `./data`). The first sync backfills 12 months; later syncs run on page load when the store is over 5 minutes old and only re-fetch the last few days. A full 12-month re-sync runs once a day to pick up older edits and deletions. If Garmin can't be reached, the stored data is shown with a notice.
+- Remote functions (`src/lib/remote`) read from the store and aggregate into chart-ready arrays on the server. Other endpoints (profile settings, weight, fitness age, today's summary) are kept in an in-memory cache for 5 minutes to 1 hour.
 - The API key is exchanged for a short-lived access token, which is refreshed when it expires or on a 401 (`src/lib/server/garmin/client.ts`).
 - API types are generated from Garmin's OpenAPI spec (`src/lib/server/garmin/openapi.json`) with `openapi-typescript` and called through `openapi-fetch`. See `AGENTS.md` for how to refresh the spec.
 
@@ -21,7 +21,7 @@ Units, time zone and the first day of the week come from your Garmin profile set
 Requires Node 24 and pnpm.
 
 1. Create a key on the [Garmin Connect Personal API](https://developer.garmin.com/gc-developer-program/personal/personal-api/) page.
-2. Copy `.env.example` to `.env` and set `GARMIN_API_KEY`.
+2. Copy `.env.example` to `.env` and set `GARMIN_API_KEY`. `DATA_DIR` must point to a directory that persists across restarts.
 3. Install and run:
 
 ```sh

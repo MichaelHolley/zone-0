@@ -1,16 +1,14 @@
 import { query } from '$app/server';
 import { utcDate } from '#lib/format.js';
-import { cached, HOUR } from '#lib/server/garmin/cache.js';
 import {
 	activityDate,
-	fetchActivities,
-	fetchDailySummaries,
 	sportOf,
 	weightedIntensityMinutes,
 	type Activity
 } from '#lib/server/garmin/data.js';
 import { addDays, weekStart, weeksBetween, type IsoDate } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
+import { getActivities, getDailySummaries } from '#lib/server/garmin/store.js';
 import { SPORTS } from '#lib/sport.js';
 import { average, sum } from '#lib/stats.js';
 
@@ -31,9 +29,7 @@ const RUNNING_BESTS = [
 async function lastYear() {
 	const { settings, today } = await getToday();
 	const start = addDays(today, -364);
-	const activities = await cached(`activities:${start}:${today}`, HOUR, () =>
-		fetchActivities(start, today)
-	);
+	const activities = await getActivities(start, today);
 	const weeks = weeksBetween(start, today, settings.firstDayOfWeek);
 	const weekOf = (date: IsoDate) => weekStart(date, settings.firstDayOfWeek);
 	return { settings, today, start, activities, weeks, weekOf };
@@ -75,9 +71,7 @@ export const getWeeklyVolume = query(async () => {
 export const getIntensityAndLoad = query(async () => {
 	const { activities, weeks, weekOf, start, today } = await lastYear();
 	const byWeek = groupByWeek(activities, weekOf);
-	const summaries = await cached(`summaries:${start}:${today}`, HOUR, () =>
-		fetchDailySummaries(start, today)
-	);
+	const summaries = await getDailySummaries(start, today);
 
 	const intensityByWeek = new Map<IsoDate, { minutes: number; goal: number | null }>();
 	for (const summary of summaries) {

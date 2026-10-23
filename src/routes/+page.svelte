@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PageHeader from '#lib/components/PageHeader.svelte';
 	import Section from '#lib/components/Section.svelte';
+	import SyncNotice from '#lib/components/SyncNotice.svelte';
 	import VitalsTiles from '#lib/components/today/VitalsTiles.svelte';
 	import WeekWorkouts from '#lib/components/today/WeekWorkouts.svelte';
 	import { formatLongDate } from '#lib/format.js';
@@ -12,6 +13,7 @@
 <svelte:head><title>Today | zone-0</title></svelte:head>
 
 <PageHeader title="Today" subtitle={formatLongDate(profile.today)} />
+<SyncNotice timeZone={profile.timeZone} />
 
 <div class="space-y-14">
 	<Section
