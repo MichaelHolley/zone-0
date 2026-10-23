@@ -1,8 +1,18 @@
 <script lang="ts">
+	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
+	import RowHeader from '#lib/components/RowHeader.svelte';
+	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
-	import { formatNumber } from '#lib/format.js';
+	import { formatNumber, orDash } from '#lib/format.js';
 	import { getFitnessAge } from '#lib/remote/body.remote.js';
+
+	const columns = [
+		{ label: 'Factor' },
+		{ label: 'Current', end: true },
+		{ label: 'Target', end: true },
+		{ label: 'Age at target', end: true }
+	];
 
 	const fitnessAge = $derived(await getFitnessAge());
 </script>
@@ -35,36 +45,24 @@
 	</div>
 
 	{#if fitnessAge.components.length > 0}
-		<div class="mt-3 overflow-x-auto rounded-2xl border border-line bg-white">
-			<table class="w-full text-sm">
-				<thead>
-					<tr class="border-b border-line text-left text-[13px] text-ash">
-						<th scope="col" class="px-5 py-3 font-medium">Factor</th>
-						<th scope="col" class="px-5 py-3 text-right font-medium">Current</th>
-						<th scope="col" class="px-5 py-3 text-right font-medium">Target</th>
-						<th scope="col" class="px-5 py-3 text-right font-medium">Age at target</th>
+		<div class="mt-3">
+			<Table {columns}>
+				{#each fitnessAge.components as component (component.label)}
+					<tr>
+						<RowHeader>{component.label}</RowHeader>
+						<Cell numeric>
+							{formatNumber(component.value, 1)}
+							{component.unit}
+						</Cell>
+						<Cell numeric>
+							{orDash(component.target, (target) => `${formatNumber(target, 1)} ${component.unit}`)}
+						</Cell>
+						<Cell numeric>
+							{orDash(component.potentialAge, (age) => formatNumber(age, 1))}
+						</Cell>
 					</tr>
-				</thead>
-				<tbody class="divide-y divide-line">
-					{#each fitnessAge.components as component (component.label)}
-						<tr>
-							<th scope="row" class="px-5 py-3.5 text-left font-medium">{component.label}</th>
-							<td class="px-5 py-3.5 text-right tabular-nums">
-								{formatNumber(component.value, 1)}
-								{component.unit}
-							</td>
-							<td class="px-5 py-3.5 text-right tabular-nums">
-								{component.target == null
-									? '-'
-									: `${formatNumber(component.target, 1)} ${component.unit}`}
-							</td>
-							<td class="px-5 py-3.5 text-right tabular-nums">
-								{component.potentialAge == null ? '-' : formatNumber(component.potentialAge, 1)}
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+				{/each}
+			</Table>
 		</div>
 	{/if}
 {/if}

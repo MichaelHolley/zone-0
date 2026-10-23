@@ -30,6 +30,7 @@ import type {
 	getWeeklyVolume
 } from '#lib/remote/training.remote.js';
 import { SPORT_COLOR, SPORTS, type Sport } from '#lib/sport.js';
+import { sum } from '#lib/stats.js';
 
 type Resolved<T extends (...args: never[]) => Promise<unknown>> = Awaited<ReturnType<T>>;
 type VolumeWeek = Resolved<typeof getWeeklyVolume>[number];
@@ -336,7 +337,7 @@ export function weekdayChart(rows: Strength['weekdays']) {
 }
 
 export function zoneShareChart(rows: Cycling['zones']) {
-	const total = rows.reduce((sum, row) => sum + row.seconds, 0);
+	const total = sum(rows.map((row) => row.seconds));
 	return categoryChart(
 		rows.map(({ zone, seconds }) => {
 			const share = total > 0 ? (seconds / total) * 100 : 0;

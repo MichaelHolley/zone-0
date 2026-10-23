@@ -11,6 +11,7 @@ import {
 } from '#lib/server/garmin/data.js';
 import { addDays, weekStart, type IsoDate } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
+import { sum } from '#lib/stats.js';
 
 const TODAY_TTL = 5 * MINUTE;
 const TREND_DAYS = 28;
@@ -48,9 +49,9 @@ export const getVitals = query(async () => {
 	]);
 
 	const week = weekStart(today, settings.firstDayOfWeek);
-	const weekIntensity = summaries
-		.filter((s) => (s.calendarDate ?? '') >= week)
-		.reduce((sum, s) => sum + weightedIntensityMinutes(s), 0);
+	const weekIntensity = sum(
+		summaries.filter((s) => (s.calendarDate ?? '') >= week).map(weightedIntensityMinutes)
+	);
 
 	return {
 		date: daily.calendarDate ?? today,

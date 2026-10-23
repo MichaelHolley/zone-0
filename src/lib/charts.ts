@@ -3,13 +3,12 @@ import { scaleUtc } from 'd3-scale';
 import { SPORT_COLOR, SPORT_LABEL, SPORTS, type Sport } from './sport';
 import { formatShortDate } from './format';
 
-export const ACCENT = '#ff385c';
-export const ACCENT_SOFT = '#ffb3c1';
+export const ACCENT = 'var(--color-accent)';
 
 export const chartTheme = {
-	foreground: '#6a6a6a',
+	foreground: 'var(--color-ash)',
 	muted: '#929292',
-	grid: '#ebebeb',
+	grid: 'var(--color-line)',
 	background: 'transparent'
 };
 

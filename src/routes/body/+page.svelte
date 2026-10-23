@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PageHeader from '#lib/components/PageHeader.svelte';
 	import Section from '#lib/components/Section.svelte';
 	import FitnessAge from '#lib/components/body/FitnessAge.svelte';
 	import WeightOverview from '#lib/components/body/WeightOverview.svelte';
@@ -9,10 +10,7 @@
 
 <svelte:head><title>Body | zone-0</title></svelte:head>
 
-<header class="mb-10">
-	<h1 class="text-[2rem] leading-tight font-bold tracking-tight">Body</h1>
-	<p class="mt-1 text-base text-ash">Last 12 months</p>
-</header>
+<PageHeader title="Body" subtitle="Last 12 months" />
 
 <div class="space-y-14">
 	<Section skeletonHeight={480}>

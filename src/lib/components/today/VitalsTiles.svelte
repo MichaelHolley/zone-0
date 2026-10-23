@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Chart } from '@tanstack/charts/svelte';
 	import Tile from '#lib/components/Tile.svelte';
-	import { formatLongDate, formatNumber } from '#lib/format.js';
+	import { formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getVitals } from '#lib/remote/today.remote.js';
 	import { areaTrend, barTrend, lineTrend, rangeTrend } from './trends.js';
 
@@ -10,7 +10,7 @@
 	const vitals = $derived(await getVitals());
 	const trend = $derived(vitals.trend);
 
-	const show = (value: number | null) => (value == null ? '-' : formatNumber(value));
+	const show = (value: number | null) => orDash(value, formatNumber);
 	const signed = (value: number) => (value > 0 ? `+${value}` : String(value));
 
 	const restingDelta = $derived(

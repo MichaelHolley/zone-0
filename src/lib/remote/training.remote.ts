@@ -12,6 +12,7 @@ import {
 import { addDays, weekStart, weeksBetween, type IsoDate } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
 import { SPORTS } from '#lib/sport.js';
+import { average, sum } from '#lib/stats.js';
 
 const rideKind = (typeKey = '') =>
 	typeKey.includes('indoor') ? 'Indoor' : typeKey.includes('gravel') ? 'Gravel' : 'Road';
@@ -47,8 +48,6 @@ function groupByWeek(activities: Activity[], weekOf: (date: IsoDate) => IsoDate)
 	return byWeek;
 }
 
-const sum = (values: number[]) => values.reduce((total, v) => total + v, 0);
-const average = (values: number[]) => (values.length ? sum(values) / values.length : null);
 const zoneSeconds = (activities: Activity[]) =>
 	HR_ZONES.map((zone) => ({
 		zone,

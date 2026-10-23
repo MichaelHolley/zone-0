@@ -14,6 +14,7 @@
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import Legend from '#lib/components/Legend.svelte';
 	import Panel from '#lib/components/Panel.svelte';
+	import PillToggle from '#lib/components/PillToggle.svelte';
 
 	let { system }: { system: MeasurementSystem } = $props();
 
@@ -29,23 +30,12 @@
 
 <Panel>
 	<div class="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-		<div role="group" aria-label="Volume metric" class="flex flex-wrap gap-2">
-			{#each METRICS as option (option)}
-				<button
-					type="button"
-					aria-pressed={metric === option}
-					onclick={() => (metric = option)}
-					class={[
-						'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors active:scale-[0.97]',
-						metric === option
-							? 'border-ink bg-ink text-white'
-							: 'border-line-strong text-ink hover:border-ink'
-					]}
-				>
-					{METRIC_LABEL[option]}
-				</button>
-			{/each}
-		</div>
+		<PillToggle
+			bind:value={metric}
+			options={METRICS}
+			label={(option) => METRIC_LABEL[option]}
+			ariaLabel="Volume metric"
+		/>
 		<Legend items={legend} />
 	</div>
 	{#if sports.length === 0}

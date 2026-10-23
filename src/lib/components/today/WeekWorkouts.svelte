@@ -8,11 +8,12 @@
 		type MeasurementSystem
 	} from '#lib/format.js';
 	import { getWeekWorkouts } from '#lib/remote/today.remote.js';
+	import { sum } from '#lib/stats.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
 
 	const workouts = $derived(await getWeekWorkouts());
-	const totalDuration = $derived(workouts.reduce((sum, w) => sum + w.duration, 0));
+	const totalDuration = $derived(sum(workouts.map((w) => w.duration)));
 
 	const effectLabel = (label: string) => {
 		const text = label.toLowerCase().replaceAll('_', ' ');

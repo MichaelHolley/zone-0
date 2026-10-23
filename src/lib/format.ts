@@ -29,6 +29,9 @@ export function toElevation(meters: number, system: MeasurementSystem): number {
 	return isMetric(system) ? meters : meters * FEET_PER_METER;
 }
 
+export const orDash = <T>(value: T | null | undefined, format: (value: T) => string) =>
+	value == null ? '-' : format(value);
+
 export function formatNumber(value: number, digits = 0): string {
 	return value.toLocaleString(LOCALE, {
 		minimumFractionDigits: digits,

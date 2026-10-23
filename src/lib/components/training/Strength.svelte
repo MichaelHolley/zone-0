@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { Chart } from '@tanstack/charts/svelte';
+	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import Panel from '#lib/components/Panel.svelte';
+	import RowHeader from '#lib/components/RowHeader.svelte';
 	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
-	import { formatDuration, formatLongDate, formatNumber } from '#lib/format.js';
+	import { formatDuration, formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getStrength } from '#lib/remote/training.remote.js';
+	import { average, sum } from '#lib/stats.js';
 	import {
 		sessionTrendChart,
 		weekdayChart,
@@ -24,12 +27,9 @@
 	];
 
 	const data = $derived(await getStrength());
-	const totalSeconds = $derived(data.sessions.reduce((sum, s) => sum + s.duration, 0));
-	const heartRates = $derived(
-		data.sessions.flatMap((s) => (s.heartRate == null ? [] : [s.heartRate]))
-	);
+	const totalSeconds = $derived(sum(data.sessions.map((s) => s.duration)));
 	const averageHeartRate = $derived(
-		heartRates.length ? heartRates.reduce((sum, hr) => sum + hr, 0) / heartRates.length : null
+		average(data.sessions.map((s) => s.heartRate).filter((hr) => hr != null))
 	);
 	const peakHeartRate = $derived(Math.max(0, ...data.sessions.map((s) => s.maxHeartRate ?? 0)));
 	const effort = (session: StrengthSession) =>
@@ -57,11 +57,7 @@
 		<Tile label="Time trained" value={formatDuration(totalSeconds)}>
 			{#snippet detail()}{formatDuration(totalSeconds / data.sessions.length)} per session{/snippet}
 		</Tile>
-		<Tile
-			label="Average heart rate"
-			value={averageHeartRate == null ? '-' : formatNumber(averageHeartRate)}
-			unit="bpm"
-		>
+		<Tile label="Average heart rate" value={orDash(averageHeartRate, formatNumber)} unit="bpm">
 			{#snippet detail()}Peak {formatNumber(peakHeartRate)} bpm{/snippet}
 		</Tile>
 	</div>
@@ -104,27 +100,14 @@
 		<Table caption="Hardest sessions by training effect" {columns}>
 			{#each hardest as session (session.date + session.duration)}
 				<tr>
-					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
-						{formatLongDate(session.date)}
-					</th>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{formatDuration(session.duration)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{session.heartRate == null ? '-' : `${formatNumber(session.heartRate)} bpm`}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{session.maxHeartRate == null ? '-' : `${formatNumber(session.maxHeartRate)} bpm`}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{session.aerobicEffect == null ? '-' : formatNumber(session.aerobicEffect, 1)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{session.anaerobicEffect == null ? '-' : formatNumber(session.anaerobicEffect, 1)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{session.calories == null ? '-' : formatNumber(session.calories)}
-					</td>
+					<RowHeader class="whitespace-nowrap">{formatLongDate(session.date)}</RowHeader>
+					<Cell numeric>{formatDuration(session.duration)}</Cell>
+					<Cell numeric>{orDash(session.heartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
+					<Cell numeric>{orDash(session.maxHeartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
+					<Cell numeric>{orDash(session.aerobicEffect, (effect) => formatNumber(effect, 1))}</Cell>
+					<Cell numeric>{orDash(session.anaerobicEffect, (effect) => formatNumber(effect, 1))}</Cell
+					>
+					<Cell numeric>{orDash(session.calories, formatNumber)}</Cell>
 				</tr>
 			{/each}
 		</Table>

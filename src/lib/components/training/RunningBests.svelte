@@ -1,5 +1,7 @@
 <script lang="ts">
+	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
+	import RowHeader from '#lib/components/RowHeader.svelte';
 	import Table from '#lib/components/Table.svelte';
 	import { formatClock, formatLongDate, formatPace, type MeasurementSystem } from '#lib/format.js';
 	import { getRunningBests } from '#lib/remote/training.remote.js';
@@ -24,14 +26,10 @@
 	<Table caption="Best efforts" {columns}>
 		{#each bests as best (best.meters)}
 			<tr>
-				<th scope="row" class="px-5 py-3.5 text-left font-medium">{best.label}</th>
-				<td class="px-5 py-3.5 text-right tabular-nums">{formatClock(best.seconds)}</td>
-				<td class="px-5 py-3.5 text-right tabular-nums">
-					{formatPace(best.seconds, best.meters, system)}
-				</td>
-				<td class="px-5 py-3.5 text-right whitespace-nowrap text-ash">
-					{formatLongDate(best.date)}
-				</td>
+				<RowHeader>{best.label}</RowHeader>
+				<Cell numeric>{formatClock(best.seconds)}</Cell>
+				<Cell numeric>{formatPace(best.seconds, best.meters, system)}</Cell>
+				<Cell class="text-right whitespace-nowrap text-ash">{formatLongDate(best.date)}</Cell>
 			</tr>
 		{/each}
 	</Table>

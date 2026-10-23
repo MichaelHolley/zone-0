@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { Chart } from '@tanstack/charts/svelte';
+	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import Legend from '#lib/components/Legend.svelte';
 	import Panel from '#lib/components/Panel.svelte';
+	import RowHeader from '#lib/components/RowHeader.svelte';
 	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import {
@@ -11,12 +13,14 @@
 		formatDuration,
 		formatLongDate,
 		formatNumber,
+		orDash,
 		speedUnit,
 		toElevation,
 		toSpeed,
 		type MeasurementSystem
 	} from '#lib/format.js';
 	import { getCycling } from '#lib/remote/training.remote.js';
+	import { sum } from '#lib/stats.js';
 	import { RIDE_KINDS, elevationChart, speedChart, zoneShareChart, type Ride } from './charts.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
@@ -31,8 +35,7 @@
 	];
 
 	const data = $derived(await getCycling());
-	const total = (pick: (ride: Ride) => number) =>
-		data.rides.reduce((sum, ride) => sum + pick(ride), 0);
+	const total = (pick: (ride: Ride) => number) => sum(data.rides.map(pick));
 	const indoorCount = $derived(data.rides.filter((ride) => ride.kind === 'Indoor').length);
 	const longest = $derived(
 		data.rides
@@ -103,25 +106,20 @@
 		<Table caption="Longest rides" {columns}>
 			{#each longest as ride (ride.date + ride.distance)}
 				<tr>
-					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
-						{formatLongDate(ride.date)}
-					</th>
-					<td class="px-5 py-3.5 text-ash">{ride.kind}</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{formatDistance(ride.distance, system)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
+					<RowHeader class="whitespace-nowrap">{formatLongDate(ride.date)}</RowHeader>
+					<Cell class="text-ash">{ride.kind}</Cell>
+					<Cell numeric>{formatDistance(ride.distance, system)}</Cell>
+					<Cell numeric>
 						{formatNumber(toElevation(ride.elevation, system))}
 						{elevationUnit(system)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{ride.speed == null
-							? '-'
-							: `${formatNumber(toSpeed(ride.speed, system), 1)} ${speedUnit(system)}`}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{ride.heartRate == null ? '-' : `${formatNumber(ride.heartRate)} bpm`}
-					</td>
+					</Cell>
+					<Cell numeric>
+						{orDash(
+							ride.speed,
+							(speed) => `${formatNumber(toSpeed(speed, system), 1)} ${speedUnit(system)}`
+						)}
+					</Cell>
+					<Cell numeric>{orDash(ride.heartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
 				</tr>
 			{/each}
 		</Table>

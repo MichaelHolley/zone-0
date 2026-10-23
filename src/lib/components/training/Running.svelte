@@ -1,5 +1,7 @@
 <script lang="ts">
+	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
+	import RowHeader from '#lib/components/RowHeader.svelte';
 	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import {
@@ -8,9 +10,11 @@
 		formatLongDate,
 		formatNumber,
 		formatPace,
+		orDash,
 		type MeasurementSystem
 	} from '#lib/format.js';
 	import { getRunning } from '#lib/remote/training.remote.js';
+	import { average, sum } from '#lib/stats.js';
 	import RunningBests from './RunningBests.svelte';
 
 	let { system }: { system: MeasurementSystem } = $props();
@@ -26,11 +30,11 @@
 	];
 
 	const runs = $derived(await getRunning());
-	const totalDistance = $derived(runs.reduce((sum, run) => sum + run.distance, 0));
-	const totalSeconds = $derived(runs.reduce((sum, run) => sum + run.movingSeconds, 0));
+	const totalDistance = $derived(sum(runs.map((run) => run.distance)));
+	const totalSeconds = $derived(sum(runs.map((run) => run.movingSeconds)));
 	const treadmillCount = $derived(runs.filter((run) => run.kind === 'Treadmill').length);
-	const heartRates = $derived(
-		runs.flatMap((run) => (run.heartRate == null ? [] : [run.heartRate]))
+	const averageHeartRate = $derived(
+		average(runs.map((run) => run.heartRate).filter((hr) => hr != null))
 	);
 	const recent = $derived(runs.toReversed().slice(0, 10));
 </script>
@@ -52,9 +56,9 @@
 			value={totalDistance > 0 ? formatPace(totalSeconds, totalDistance, system) : '-'}
 		>
 			{#snippet detail()}
-				{heartRates.length
-					? `${formatNumber(heartRates.reduce((sum, hr) => sum + hr, 0) / heartRates.length)} bpm average`
-					: 'No heart rate'}
+				{averageHeartRate == null
+					? 'No heart rate'
+					: `${formatNumber(averageHeartRate)} bpm average`}
 			{/snippet}
 		</Tile>
 	</div>
@@ -63,25 +67,15 @@
 		<Table caption="Recent runs" {columns}>
 			{#each recent as run (run.date + run.distance)}
 				<tr>
-					<th scope="row" class="px-5 py-3.5 text-left font-medium whitespace-nowrap">
-						{formatLongDate(run.date)}
-					</th>
-					<td class="px-5 py-3.5 text-ash">{run.kind}</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{formatDistance(run.distance, system)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{formatDuration(run.movingSeconds)}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
+					<RowHeader class="whitespace-nowrap">{formatLongDate(run.date)}</RowHeader>
+					<Cell class="text-ash">{run.kind}</Cell>
+					<Cell numeric>{formatDistance(run.distance, system)}</Cell>
+					<Cell numeric>{formatDuration(run.movingSeconds)}</Cell>
+					<Cell numeric>
 						{run.distance > 0 ? formatPace(run.movingSeconds, run.distance, system) : '-'}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{run.heartRate == null ? '-' : `${formatNumber(run.heartRate)} bpm`}
-					</td>
-					<td class="px-5 py-3.5 text-right tabular-nums">
-						{run.cadence == null ? '-' : `${formatNumber(run.cadence)} spm`}
-					</td>
+					</Cell>
+					<Cell numeric>{orDash(run.heartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
+					<Cell numeric>{orDash(run.cadence, (cadence) => `${formatNumber(cadence)} spm`)}</Cell>
 				</tr>
 			{/each}
 		</Table>
