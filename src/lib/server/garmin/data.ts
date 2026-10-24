@@ -54,6 +54,7 @@ export function sportOf(activity: Activity): Sport {
 		return 'cycling';
 	}
 	if (typeKey.includes('strength')) return 'strength';
+	if (/walking|hiking/.test(typeKey)) return 'walking';
 	return 'other';
 }
 

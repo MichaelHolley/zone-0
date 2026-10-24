@@ -87,7 +87,7 @@ export function volumeRows(
 ): VolumeRow[] {
 	return data.flatMap(({ week, sport, duration, distance, count }) => {
 		if (metric === 'distance') {
-			const hasDistance = sport === 'running' || sport === 'cycling';
+			const hasDistance = sport === 'running' || sport === 'cycling' || sport === 'walking';
 			return hasDistance ? [{ week, sport, value: toDistance(distance, system) }] : [];
 		}
 		return [{ week, sport, value: metric === 'duration' ? duration / 3600 : count }];

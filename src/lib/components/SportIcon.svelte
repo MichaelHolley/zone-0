@@ -2,6 +2,7 @@
 	import PersonSimpleRunIcon from 'phosphor-svelte/lib/PersonSimpleRunIcon';
 	import BicycleIcon from 'phosphor-svelte/lib/BicycleIcon';
 	import BarbellIcon from 'phosphor-svelte/lib/BarbellIcon';
+	import PersonSimpleHikeIcon from 'phosphor-svelte/lib/PersonSimpleHikeIcon';
 	import PulseIcon from 'phosphor-svelte/lib/PulseIcon';
 	import { SPORT_COLOR, SPORT_LABEL, type Sport } from '#lib/sport.js';
 
@@ -11,6 +12,7 @@
 		running: PersonSimpleRunIcon,
 		cycling: BicycleIcon,
 		strength: BarbellIcon,
+		walking: PersonSimpleHikeIcon,
 		other: PulseIcon
 	};
 	const Icon = $derived(icons[sport]);
