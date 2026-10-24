@@ -68,6 +68,11 @@ export const getVitals = query(async () => {
 			active: measured(daily.activeKilocalories),
 			total: measured(daily.totalKilocalories)
 		},
+		respiration: {
+			avg: measured(daily.avgWakingRespirationValue),
+			low: measured(daily.lowestRespirationValue),
+			high: measured(daily.highestRespirationValue)
+		},
 		trend: summaries
 			.filter((s) => s.calendarDate)
 			.map((s) => ({
@@ -77,7 +82,8 @@ export const getVitals = query(async () => {
 				bodyBatteryLow: measured(s.bodyBattery?.minValue),
 				bodyBatteryHigh: measured(s.bodyBattery?.maxValue),
 				intensity: weightedIntensityMinutes(s),
-				caloriesActive: measured(s.calories?.burnedActive)
+				caloriesActive: measured(s.calories?.burnedActive),
+				respiration: measured(s.respiration?.avgValue)
 			}))
 	};
 });
