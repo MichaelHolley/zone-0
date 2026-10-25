@@ -8,6 +8,7 @@
 	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import {
+		distanceUnit,
 		elevationUnit,
 		formatDistance,
 		formatDuration,
@@ -21,7 +22,14 @@
 	} from '#lib/format.js';
 	import { getCycling } from '#lib/remote/training.remote.js';
 	import { sum } from '#lib/stats.js';
-	import { RIDE_KINDS, elevationChart, speedChart, zoneShareChart, type Ride } from './charts.js';
+	import {
+		RIDE_SYMBOLS,
+		elevationChart,
+		rideClimbChart,
+		speedChart,
+		zoneShareChart,
+		type Ride
+	} from './charts.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
 
@@ -85,10 +93,10 @@
 		</Panel>
 
 		<Panel title="Average speed per ride ({speedUnit(system)})">
-			{#snippet aside()}<Legend items={RIDE_KINDS} />{/snippet}
+			{#snippet aside()}<Legend items={RIDE_SYMBOLS} />{/snippet}
 			<Chart
 				definition={speedChart(data.rides, system)}
-				ariaLabel="Average speed of each outdoor ride, last 12 months"
+				ariaLabel="Average speed of each outdoor ride, colored by average heart rate, last 12 months"
 				height={200}
 			/>
 		</Panel>
@@ -97,6 +105,14 @@
 			<Chart
 				definition={zoneShareChart(data.zones)}
 				ariaLabel="Share of cycling time in each heart rate zone, last 12 months"
+				height={200}
+			/>
+		</Panel>
+
+		<Panel title="Distance ({distanceUnit(system)}) vs. climb ({elevationUnit(system)})">
+			<Chart
+				definition={rideClimbChart(data.rides, system)}
+				ariaLabel="Distance against climb of each outdoor ride, colored by average speed, last 12 months"
 				height={200}
 			/>
 		</Panel>

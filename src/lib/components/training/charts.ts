@@ -1,8 +1,9 @@
-import { barY, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
+import { barY, colorLegend, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
+import { decorative } from '@tanstack/charts/mark/decorative';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
-import { scaleUtc } from 'd3-scale';
+import { scaleLinear as d3ScaleLinear, scaleUtc } from 'd3-scale';
 import {
 	ACCENT,
 	chartTheme,
@@ -225,9 +226,9 @@ export function effectChart(rows: Intensity['trainingEffect']) {
 	});
 }
 
-export const RIDE_KINDS = [
-	{ label: 'Road', color: '#2563eb' },
-	{ label: 'Gravel', color: '#a16207' }
+export const RIDE_SYMBOLS = [
+	{ label: 'Road', color: chartTheme.muted },
+	{ label: 'Gravel', color: chartTheme.muted, hollow: true }
 ] as const;
 
 export function elevationChart(rows: Cycling['weeks'], system: MeasurementSystem) {
@@ -253,22 +254,94 @@ export function elevationChart(rows: Cycling['weeks'], system: MeasurementSystem
 	});
 }
 
+const DOT_RADIUS = 4.5;
+
 export function speedChart(rides: Ride[], system: MeasurementSystem) {
 	const unit = speedUnit(system);
-	const data = rides.flatMap(({ date, kind, speed }) =>
+	const data = rides.flatMap(({ date, kind, speed, heartRate }) =>
 		speed != null && kind !== 'Indoor'
-			? [{ date: utcDate(date), kind, speed: toSpeed(speed, system) }]
+			? [{ date: utcDate(date), kind, heartRate, speed: toSpeed(speed, system) }]
 			: []
 	);
+	const heartRates = data.flatMap((ride) => (ride.heartRate == null ? [] : [ride.heartRate]));
 	return defineChart({
-		marks: [dot(data, { x: 'date', y: 'speed', color: 'kind', r: 4, fillOpacity: 0.85 })],
+		marks: [
+			dot(data, { x: 'date', y: 'speed', color: 'heartRate', r: DOT_RADIUS }),
+			// dot colors only reach the fill, so gravel rings are punched out with a white dot on top
+			decorative(
+				dot(
+					data.filter((ride) => ride.kind === 'Gravel'),
+					{ x: 'date', y: 'speed', fill: '#ffffff', r: DOT_RADIUS - 2 }
+				)
+			)
+		],
 		scales: { x: weekAxis, y: { ...valueAxis, nice: true } },
-		color: { domain: RIDE_KINDS.map((k) => k.label), range: RIDE_KINDS.map((k) => k.color) },
+		color: {
+			scale: d3ScaleLinear<string>()
+				.domain([Math.min(...heartRates), Math.max(...heartRates)])
+				.range([ZONES[2].color, ZONES[3].color])
+				.unknown(chartTheme.muted),
+			legend: colorLegend({ label: 'Avg HR (bpm)', format: (value) => formatNumber(value) })
+		},
 		theme: chartTheme,
 		tooltip: {
 			use: tooltip,
 			format: (p) =>
-				`${longDate(p.datum.date)}\n${p.datum.kind} ${formatNumber(p.datum.speed, 1)} ${unit}`
+				`${longDate(p.datum.date)}\n${p.datum.kind} ${formatNumber(p.datum.speed, 1)} ${unit}${p.datum.heartRate == null ? '' : ` at ${formatNumber(p.datum.heartRate)} bpm`}`
+		}
+	});
+}
+
+export function rideClimbChart(rides: Ride[], system: MeasurementSystem) {
+	const unit = speedUnit(system);
+	const data = rides.flatMap(({ date, kind, distance, elevation, speed }) =>
+		speed != null && kind !== 'Indoor' && distance > 0
+			? [
+					{
+						date,
+						kind,
+						distance: toDistance(distance, system),
+						climb: toElevation(elevation, system),
+						speed: toSpeed(speed, system)
+					}
+				]
+			: []
+	);
+	const speeds = data.map((ride) => ride.speed);
+	const slowest = Math.min(...speeds);
+	const fastest = Math.max(...speeds);
+	return defineChart({
+		marks: [
+			dot(data, {
+				x: 'distance',
+				y: 'climb',
+				key: (ride) => `${ride.date}-${ride.distance}`,
+				color: 'speed',
+				r: 4.5
+			})
+		],
+		scales: {
+			x: {
+				scale: scaleLinear,
+				nice: true,
+				axis: { line: false, ticks: { count: 5, size: 0 } }
+			},
+			y: { ...valueAxis, nice: true }
+		},
+		color: {
+			scale: d3ScaleLinear<string>()
+				.domain([slowest, fastest])
+				.range(['#4ade80', SPORT_COLOR.cycling]),
+			legend: colorLegend({
+				label: `Avg speed (${unit})`,
+				format: (value) => formatNumber(value)
+			})
+		},
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: (p) =>
+				`${formatLongDate(p.datum.date)}\n${p.datum.kind} ${formatNumber(p.datum.distance, 1)} ${distanceUnit(system)}, ${formatNumber(p.datum.climb)} ${elevationUnit(system)} climbed\n${formatNumber(p.datum.speed, 1)} ${unit}`
 		}
 	});
 }
