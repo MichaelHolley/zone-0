@@ -1,20 +1,27 @@
 <script lang="ts">
+	import { Chart } from '@tanstack/charts/svelte';
 	import Cell from '#lib/components/Cell.svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
+	import Panel from '#lib/components/Panel.svelte';
 	import RowHeader from '#lib/components/RowHeader.svelte';
 	import Table from '#lib/components/Table.svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import {
+		distanceUnit,
 		formatDistance,
+		formatClock,
 		formatDuration,
 		formatLongDate,
 		formatNumber,
 		formatPace,
 		orDash,
+		toDistance,
 		type MeasurementSystem
 	} from '#lib/format.js';
 	import { getRunning } from '#lib/remote/training.remote.js';
+	import { SPORT_COLOR } from '#lib/sport.js';
 	import { average, sum } from '#lib/stats.js';
+	import { sessionTrendChart } from './charts.js';
 	import RunningBests from './RunningBests.svelte';
 
 	let { system }: { system: MeasurementSystem } = $props();
@@ -36,6 +43,8 @@
 	const averageHeartRate = $derived(
 		average(runs.map((run) => run.heartRate).filter((hr) => hr != null))
 	);
+	const paceOf = (run: (typeof runs)[number]) =>
+		run.distance > 0 ? run.movingSeconds / toDistance(run.distance, system) : null;
 	const recent = $derived(runs.toReversed().slice(0, 10));
 </script>
 
@@ -61,6 +70,16 @@
 					: `${formatNumber(averageHeartRate)} bpm average`}
 			{/snippet}
 		</Tile>
+	</div>
+
+	<div class="mt-3">
+		<Panel title="Pace per run (min/{distanceUnit(system)})">
+			<Chart
+				definition={sessionTrendChart(runs, paceOf, formatClock, SPORT_COLOR.running)}
+				ariaLabel="Pace of each run, last 12 months"
+				height={200}
+			/>
+		</Panel>
 	</div>
 
 	<div class="mt-3">

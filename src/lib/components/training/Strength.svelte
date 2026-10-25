@@ -9,12 +9,7 @@
 	import { formatDuration, formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getStrength } from '#lib/remote/training.remote.js';
 	import { average, sum } from '#lib/stats.js';
-	import {
-		sessionTrendChart,
-		weekdayChart,
-		zoneShareChart,
-		type StrengthSession
-	} from './charts.js';
+	import { sessionTrendChart, weekdayChart, zoneShareChart } from './charts.js';
 
 	const columns = [
 		{ label: 'Date' },
@@ -32,9 +27,7 @@
 		average(data.sessions.map((s) => s.heartRate).filter((hr) => hr != null))
 	);
 	const peakHeartRate = $derived(Math.max(0, ...data.sessions.map((s) => s.maxHeartRate ?? 0)));
-	const effort = (session: StrengthSession) =>
-		(session.aerobicEffect ?? 0) + (session.anaerobicEffect ?? 0);
-	const hardest = $derived(data.sessions.toSorted((a, b) => effort(b) - effort(a)).slice(0, 5));
+	const recent = $derived(data.sessions.slice(-5).toReversed());
 </script>
 
 {#if data.sessions.length === 0}
@@ -65,7 +58,11 @@
 	<div class="mt-3 grid gap-3 md:grid-cols-2">
 		<Panel title="Session duration (min)">
 			<Chart
-				definition={sessionTrendChart(data.sessions, (s) => s.duration / 60, 'min')}
+				definition={sessionTrendChart(
+					data.sessions,
+					(s) => s.duration / 60,
+					(v) => `${formatNumber(v)} min`
+				)}
 				ariaLabel="Duration of each strength session, last 12 months"
 				height={200}
 			/>
@@ -73,7 +70,11 @@
 
 		<Panel title="Average heart rate per session (bpm)">
 			<Chart
-				definition={sessionTrendChart(data.sessions, (s) => s.heartRate, 'bpm')}
+				definition={sessionTrendChart(
+					data.sessions,
+					(s) => s.heartRate,
+					(v) => `${formatNumber(v)} bpm`
+				)}
 				ariaLabel="Average heart rate of each strength session, last 12 months"
 				height={200}
 			/>
@@ -97,8 +98,8 @@
 	</div>
 
 	<div class="mt-3">
-		<Table caption="Hardest sessions by training effect" {columns}>
-			{#each hardest as session (session.date + session.duration)}
+		<Table caption="Recent sessions" {columns}>
+			{#each recent as session (session.date + session.duration)}
 				<tr>
 					<RowHeader class="whitespace-nowrap">{formatLongDate(session.date)}</RowHeader>
 					<Cell numeric>{formatDuration(session.duration)}</Cell>

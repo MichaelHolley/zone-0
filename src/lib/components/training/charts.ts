@@ -275,10 +275,11 @@ export function speedChart(rides: Ride[], system: MeasurementSystem) {
 
 const TREND_WINDOW = 10;
 
-export function sessionTrendChart(
-	sessions: StrengthSession[],
-	pick: (session: StrengthSession) => number | null,
-	unit: string
+export function sessionTrendChart<T extends { date: string }>(
+	sessions: T[],
+	pick: (session: T) => number | null,
+	format: (value: number) => string,
+	color = SPORT_COLOR.strength
 ) {
 	const points = sessions.flatMap((session) => {
 		const value = pick(session);
@@ -288,18 +289,24 @@ export function sessionTrendChart(
 		const recent = points.slice(Math.max(0, index - TREND_WINDOW + 1), index + 1);
 		return { ...point, average: recent.reduce((s, p) => s + p.value, 0) / recent.length };
 	});
-	const color = SPORT_COLOR.strength;
 	return defineChart({
 		marks: [
 			dot(rows, { x: 'date', y: 'value', fill: color, fillOpacity: 0.3, r: 3 }),
 			lineY(rows, { x: 'date', y: 'average', stroke: color, strokeWidth: 2 })
 		],
-		scales: { x: weekAxis, y: { ...valueAxis, nice: true } },
+		scales: {
+			x: weekAxis,
+			y: {
+				...valueAxis,
+				nice: true,
+				axis: { ...valueAxis.axis, ticks: { ...valueAxis.axis.ticks, format } }
+			}
+		},
 		theme: chartTheme,
 		tooltip: {
 			use: tooltip,
 			format: (p) =>
-				`${longDate(p.datum.date)}\n${formatNumber(p.datum.value)} ${unit}\n${formatNumber(p.datum.average)} ${unit} ${TREND_WINDOW}-session average`
+				`${longDate(p.datum.date)}\n${format(p.datum.value)}\n${format(p.datum.average)} average of last ${TREND_WINDOW}`
 		}
 	});
 }
