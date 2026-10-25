@@ -27,7 +27,8 @@
 		average(data.sessions.map((s) => s.heartRate).filter((hr) => hr != null))
 	);
 	const peakHeartRate = $derived(Math.max(0, ...data.sessions.map((s) => s.maxHeartRate ?? 0)));
-	const recent = $derived(data.sessions.slice(-5).toReversed());
+	let visibleCount = $state(5);
+	const recent = $derived(data.sessions.toReversed().slice(0, visibleCount));
 </script>
 
 {#if data.sessions.length === 0}
@@ -112,5 +113,14 @@
 				</tr>
 			{/each}
 		</Table>
+		{#if visibleCount < data.sessions.length}
+			<button
+				type="button"
+				onclick={() => (visibleCount += 5)}
+				class="mx-auto mt-3 block rounded-full border border-line-strong px-4 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink active:scale-[0.97]"
+			>
+				Show 5 more
+			</button>
+		{/if}
 	</div>
 {/if}
