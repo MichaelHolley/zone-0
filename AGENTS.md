@@ -10,6 +10,10 @@ The user's sports, in order of priority: Strength Training (Gym), Cycling, Runni
 
 Strength training is the main focus, but the user does not use Garmin's strength tracking features (exercise sets, reps, weights). They treat the watch as a running timer that logs heart rate only, so expect duration and heart rate data for strength activities, nothing exercise-level.
 
+## Charts
+
+Charts use `@tanstack/charts`. When proposing or building a chart, don't limit yourself to the bar, line and dot charts already in the app: the library also has heatmaps, beeswarms, regressions, ridgelines, violins, box plots, waffles, difference areas, and more. Pick the type that fits the question the chart answers. Read the library's docs in `node_modules/@tanstack/charts/docs` (start with `reference/index.md`).
+
 ## Garmin API
 
 The project integrates with the free Garmin Connect Personal API (personal use).
