@@ -41,19 +41,9 @@ function bounds(rows: TrendRow[]) {
 	return [rows[0]?.date ?? new Date(), rows.at(-1)?.date ?? new Date()] as const;
 }
 
-export function lineTrend(
-	rows: TrendRow[],
-	key: NumericKey,
-	unit: string,
-	reference?: number | null
-) {
+export function lineTrend(rows: TrendRow[], key: NumericKey, unit: string) {
 	return defineChart({
-		marks: [
-			...(reference == null
-				? []
-				: [ruleY([reference], { stroke: chartTheme.muted, strokeDasharray: '3 3' })]),
-			lineY(rows, { x: 'date', y: key, stroke: ACCENT, strokeWidth: 1.75 })
-		],
+		marks: [lineY(rows, { x: 'date', y: key, stroke: ACCENT, strokeWidth: 1.75 })],
 		scales: axes(...bounds(rows)),
 		theme: chartTheme,
 		tooltip: { use: tooltip, format: (p) => describe(p.datum, p.datum[key], unit) }
@@ -101,6 +91,34 @@ export function rangeTrend(rows: TrendRow[]) {
 				p.datum.bodyBatteryHigh == null
 					? `${formatShortDate(p.datum.date)}\nNo data`
 					: `${formatShortDate(p.datum.date)}\nHigh ${p.datum.bodyBatteryHigh}, low ${p.datum.bodyBatteryLow}`
+		}
+	});
+}
+
+export function heartRateTrend(rows: TrendRow[], sevenDayAvg: number | null) {
+	return defineChart({
+		marks: [
+			barY(rows, {
+				x: 'date',
+				y1: 'hrLow',
+				y2: 'hrHigh',
+				fill: ACCENT,
+				fillOpacity: 0.2,
+				radius: 2
+			}),
+			...(sevenDayAvg == null
+				? []
+				: [ruleY([sevenDayAvg], { stroke: chartTheme.muted, strokeDasharray: '3 3' })]),
+			lineY(rows, { x: 'date', y: 'restingHr', stroke: ACCENT, strokeWidth: 1.75 })
+		],
+		scales: barAxes(rows),
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: ({ datum }) =>
+				datum.restingHr == null
+					? `${formatShortDate(datum.date)}\nNo data`
+					: `${formatShortDate(datum.date)}\nResting ${datum.restingHr} bpm\nLow ${datum.hrLow ?? '–'}, high ${datum.hrHigh ?? '–'}`
 		}
 	});
 }

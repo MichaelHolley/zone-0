@@ -50,7 +50,9 @@ export const getVitals = query(async () => {
 		date: daily.calendarDate ?? today,
 		restingHr: {
 			value: measured(daily.restingHeartRate),
-			sevenDayAvg: measured(daily.lastSevenDaysAvgRestingHeartRate)
+			sevenDayAvg: measured(daily.lastSevenDaysAvgRestingHeartRate),
+			low: measured(daily.minHeartRate),
+			high: measured(daily.maxHeartRate)
 		},
 		stress: {
 			avg: measured(daily.averageStressLevel),
@@ -78,6 +80,8 @@ export const getVitals = query(async () => {
 			.map((s) => ({
 				date: utcDate(s.calendarDate!),
 				restingHr: measured(s.heartRate?.restingValue),
+				hrLow: measured(s.heartRate?.minValue),
+				hrHigh: measured(s.heartRate?.maxValue),
 				stressAvg: measured(s.stress?.avgLevel),
 				bodyBatteryLow: measured(s.bodyBattery?.minValue),
 				bodyBatteryHigh: measured(s.bodyBattery?.maxValue),

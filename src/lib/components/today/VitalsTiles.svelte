@@ -3,7 +3,7 @@
 	import Tile from '#lib/components/Tile.svelte';
 	import { formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getVitals } from '#lib/remote/today.remote.js';
-	import { areaTrend, barTrend, lineTrend, rangeTrend } from './trends.js';
+	import { areaTrend, barTrend, heartRateTrend, lineTrend, rangeTrend } from './trends.js';
 
 	let { today }: { today: string } = $props();
 
@@ -45,10 +45,12 @@
 					({signed(restingDelta)})
 				</span>
 			{/if}
+			<br />
+			Low {show(vitals.restingHr.low)}, high {show(vitals.restingHr.high)} bpm
 		{/snippet}
 		<Chart
-			definition={lineTrend(trend, 'restingHr', 'bpm', vitals.restingHr.sevenDayAvg)}
-			ariaLabel="Resting heart rate, last 28 days"
+			definition={heartRateTrend(trend, vitals.restingHr.sevenDayAvg)}
+			ariaLabel="Resting heart rate with daily low and high, last 28 days"
 			height={CHART_HEIGHT}
 		/>
 	</Tile>
