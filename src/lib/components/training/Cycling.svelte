@@ -84,10 +84,10 @@
 	</div>
 
 	<div class="mt-3 grid gap-3 md:grid-cols-2">
-		<Panel title="Weekly climbing ({elevationUnit(system)})">
+		<Panel title="Time in heart rate zones (%)">
 			<Chart
-				definition={elevationChart(data.weeks, system)}
-				ariaLabel="Weekly elevation gain from cycling, last 12 months"
+				definition={zoneShareChart(data.zones)}
+				ariaLabel="Share of cycling time in each heart rate zone, last 12 months"
 				height={200}
 			/>
 		</Panel>
@@ -101,10 +101,10 @@
 			/>
 		</Panel>
 
-		<Panel title="Time in heart rate zones (%)">
+		<Panel title="Weekly climbing ({elevationUnit(system)})">
 			<Chart
-				definition={zoneShareChart(data.zones)}
-				ariaLabel="Share of cycling time in each heart rate zone, last 12 months"
+				definition={elevationChart(data.weeks, system)}
+				ariaLabel="Weekly elevation gain from cycling, last 12 months"
 				height={200}
 			/>
 		</Panel>
