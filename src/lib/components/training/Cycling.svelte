@@ -96,7 +96,7 @@
 			{#snippet aside()}<Legend items={RIDE_SYMBOLS} />{/snippet}
 			<Chart
 				definition={speedChart(data.rides, system)}
-				ariaLabel="Average speed of each outdoor ride, colored by average heart rate, last 12 months"
+				ariaLabel="Average speed of each outdoor ride, colored by average heart rate, gravel as filled circles and road as rings, last 12 months"
 				height={200}
 			/>
 		</Panel>
@@ -110,9 +110,10 @@
 		</Panel>
 
 		<Panel title="Distance ({distanceUnit(system)}) vs. climb ({elevationUnit(system)})">
+			{#snippet aside()}<Legend items={RIDE_SYMBOLS} />{/snippet}
 			<Chart
 				definition={rideClimbChart(data.rides, system)}
-				ariaLabel="Distance against climb of each outdoor ride, colored by average speed, last 12 months"
+				ariaLabel="Distance against climb of each outdoor ride, colored by average speed, gravel as filled circles and road as rings, last 12 months"
 				height={200}
 			/>
 		</Panel>
