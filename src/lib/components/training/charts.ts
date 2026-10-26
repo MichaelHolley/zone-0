@@ -227,8 +227,8 @@ export function effectChart(rows: Intensity['trainingEffect']) {
 }
 
 export const RIDE_SYMBOLS = [
-	{ label: 'Road', color: chartTheme.muted },
-	{ label: 'Gravel', color: chartTheme.muted, hollow: true }
+	{ label: 'Road', color: chartTheme.muted, hollow: true },
+	{ label: 'Gravel', color: chartTheme.muted }
 ] as const;
 
 export function elevationChart(rows: Cycling['weeks'], system: MeasurementSystem) {
@@ -267,10 +267,10 @@ export function speedChart(rides: Ride[], system: MeasurementSystem) {
 	return defineChart({
 		marks: [
 			dot(data, { x: 'date', y: 'speed', color: 'heartRate', r: DOT_RADIUS }),
-			// dot colors only reach the fill, so gravel rings are punched out with a white dot on top
+			/** Dot colors only reach the fill, so road rings need a white center overlay. */
 			decorative(
 				dot(
-					data.filter((ride) => ride.kind === 'Gravel'),
+					data.filter((ride) => ride.kind === 'Road'),
 					{ x: 'date', y: 'speed', fill: '#ffffff', r: DOT_RADIUS - 2 }
 				)
 			)
@@ -317,8 +317,14 @@ export function rideClimbChart(rides: Ride[], system: MeasurementSystem) {
 				y: 'climb',
 				key: (ride) => `${ride.date}-${ride.distance}`,
 				color: 'speed',
-				r: 4.5
-			})
+				r: DOT_RADIUS
+			}),
+			decorative(
+				dot(
+					data.filter((ride) => ride.kind === 'Road'),
+					{ x: 'distance', y: 'climb', fill: '#ffffff', r: DOT_RADIUS - 2 }
+				)
+			)
 		],
 		scales: {
 			x: {

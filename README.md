@@ -6,6 +6,8 @@ A personal, read-only dashboard for your Garmin data. It pulls workouts, daily v
 - **Training**: the last 12 months of weekly volume per sport (running, cycling, strength, other), heart rate zones, training load, intensity minutes vs. goal, training effect, plus dedicated Strength, Cycling and Running sections with session and ride stats, heart rate zone shares (Strength and Cycling), charts and best efforts.
 - **Body**: weight over the last 12 months against your weight goal, and fitness age.
 
+Cycling's speed-per-ride and distance-vs.-climb charts distinguish gravel rides (filled circles) from road rides (rings).
+
 Units, time zone and the first day of the week come from your Garmin profile settings.
 
 ## How it works
