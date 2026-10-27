@@ -3,7 +3,7 @@
 A personal, read-only dashboard for your Garmin data. It pulls workouts, daily vitals and weight from the [Garmin Connect Personal API](https://developer.garmin.com/gc-developer-program/personal/personal-api/) and shows them in three pages:
 
 - **Today**: resting heart rate, stress, body battery, intensity minutes, calories and respiration, each with a 4-week trend, plus this week's workouts.
-- **Training**: the last 12 months of weekly volume per sport (running, cycling, strength, other), heart rate zones, training load, intensity minutes vs. goal, training effect, plus dedicated Strength, Cycling and Running sections with session and ride stats, heart rate zone shares (Cycling, Running), average pace per run with its top pace (Running), charts and best efforts.
+- **Training**: the last 12 months of weekly volume per sport (running, cycling, strength, other), heart rate zones, training load, intensity minutes vs. goal, training effect, a Progress section that tracks cycling and running speed scaled to the same heart rate (climb- and grade-adjusted) with a 12-month trend, plus dedicated Strength, Cycling and Running sections with session and ride stats, heart rate zone shares (Cycling, Running), average pace per run with its top pace (Running), charts and best efforts.
 - **Body**: weight over the last 12 months against your weight goal, and fitness age.
 
 Cycling's speed-per-ride and distance-vs.-climb charts distinguish gravel rides (filled circles) from road rides (rings).

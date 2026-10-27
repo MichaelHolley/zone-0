@@ -10,10 +10,12 @@ import { addDays, weekStart, weeksBetween, type IsoDate } from '#lib/server/garm
 import { getToday } from '#lib/server/garmin/settings.js';
 import { getActivities, getDailySummaries } from '#lib/server/garmin/store.js';
 import { SPORTS } from '#lib/sport.js';
-import { average, sum } from '#lib/stats.js';
+import { average, median, sum } from '#lib/stats.js';
 
 const rideKind = (typeKey = '') =>
 	typeKey.includes('indoor') ? 'Indoor' : typeKey.includes('gravel') ? 'Gravel' : 'Road';
+const runKind = (typeKey = '') => (typeKey.includes('treadmill') ? 'Treadmill' : 'Outdoor');
+const movingSeconds = (activity: Activity) => activity.movingDuration ?? activity.duration ?? 0;
 
 const HR_ZONES = [1, 2, 3, 4, 5] as const;
 const RUNNING_BESTS = [
@@ -172,9 +174,9 @@ export const getRunning = query(async () => {
 		runs: runs
 			.map((a) => ({
 				date: activityDate(a),
-				kind: a.activityType?.typeKey?.includes('treadmill') ? 'Treadmill' : 'Outdoor',
+				kind: runKind(a.activityType?.typeKey),
 				distance: a.distance ?? 0,
-				movingSeconds: a.movingDuration ?? a.duration ?? 0,
+				movingSeconds: movingSeconds(a),
 				maxSpeed: a.maxSpeed ?? null,
 				heartRate: a.averageHR ?? null,
 				cadence: a.averageRunningCadenceInStepsPerMinute ?? null
@@ -199,11 +201,84 @@ export const getCycling = query(async () => {
 				date: activityDate(a),
 				kind: rideKind(a.activityType?.typeKey),
 				distance: a.distance ?? 0,
-				movingSeconds: a.movingDuration ?? a.duration ?? 0,
+				movingSeconds: movingSeconds(a),
 				elevation: a.elevationGain ?? 0,
 				speed: a.averageSpeed ?? null,
 				heartRate: a.averageHR ?? null
 			}))
 			.toSorted((a, b) => a.date.localeCompare(b.date))
+	};
+});
+
+/** Each 100 m climbed counts as 1 km of flat riding. */
+const CLIMB_FLAT_FACTOR = 10;
+/** Average heart rate of shorter efforts is still catching up with the effort. */
+const MIN_EFFORT_SECONDS = 5 * 60;
+/** Efforts barely above resting heart rate would blow up the normalization. */
+const MIN_HR_ABOVE_REST = 15;
+/** Power grows with the cube of speed on a bike (air drag) but linearly when running. */
+const CYCLING_EXPONENT = 1 / 3;
+const RUNNING_EXPONENT = 1;
+
+type Effort = { heartRate: number; adjustedSpeed: number };
+
+/** Scales each effort's speed to what it would be at the sport's typical heart rate. */
+function normalizeEfforts<T extends Effort>(
+	efforts: T[],
+	restingHr: number | null,
+	exponent: number
+) {
+	const typicalHr = median(efforts.map((effort) => effort.heartRate));
+	if (restingHr == null || typicalHr == null) return { referenceHr: null, efforts: [] };
+	const referenceHr = Math.round(typicalHr / 5) * 5;
+	return {
+		referenceHr,
+		efforts: efforts
+			.filter((effort) => effort.heartRate - restingHr >= MIN_HR_ABOVE_REST)
+			.map((effort) => ({
+				...effort,
+				normalizedSpeed:
+					effort.adjustedSpeed *
+					((referenceHr - restingHr) / (effort.heartRate - restingHr)) ** exponent
+			}))
+	};
+}
+
+function timedEffort(activity: Activity) {
+	const seconds = movingSeconds(activity);
+	const { distance, averageHR, elevationGain = 0 } = activity;
+	if (!distance || !averageHR || seconds < MIN_EFFORT_SECONDS) return null;
+	return {
+		date: activityDate(activity),
+		heartRate: averageHR,
+		distance,
+		elevation: elevationGain,
+		speed: distance / seconds
+	};
+}
+
+export const getProgress = query(async () => {
+	const { activities, start, today } = await lastYear();
+	const summaries = await getDailySummaries(start, today);
+	const restingHr = median(summaries.flatMap((s) => s.heartRate?.restingValue ?? []));
+
+	const rides = activities.flatMap((a) => {
+		const kind = rideKind(a.activityType?.typeKey);
+		const effort = sportOf(a) === 'cycling' && kind !== 'Indoor' ? timedEffort(a) : null;
+		if (!effort) return [];
+		const flatDistance = effort.distance + CLIMB_FLAT_FACTOR * effort.elevation;
+		return [{ ...effort, kind, adjustedSpeed: (flatDistance / effort.distance) * effort.speed }];
+	});
+	const runs = activities.flatMap((a) => {
+		const effort = sportOf(a) === 'running' ? timedEffort(a) : null;
+		if (!effort) return [];
+		const kind = runKind(a.activityType?.typeKey);
+		return [{ ...effort, kind, adjustedSpeed: a.avgGradeAdjustedSpeed ?? effort.speed }];
+	});
+
+	return {
+		cycling: normalizeEfforts(rides, restingHr, CYCLING_EXPONENT),
+		running: normalizeEfforts(runs, restingHr, RUNNING_EXPONENT),
+		restingHr
 	};
 });

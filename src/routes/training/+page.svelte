@@ -4,6 +4,7 @@
 	import SyncNotice from '#lib/components/SyncNotice.svelte';
 	import Cycling from '#lib/components/training/Cycling.svelte';
 	import IntensityLoad from '#lib/components/training/IntensityLoad.svelte';
+	import Progress from '#lib/components/training/Progress.svelte';
 	import Running from '#lib/components/training/Running.svelte';
 	import Strength from '#lib/components/training/Strength.svelte';
 	import WeeklyVolume from '#lib/components/training/WeeklyVolume.svelte';
@@ -28,6 +29,14 @@
 		skeletonHeight={440}
 	>
 		<IntensityLoad />
+	</Section>
+
+	<Section
+		title="Progress"
+		description="Speed scaled to the same heart rate: faster at the same effort means fitter. Line: 12-month trend"
+		skeletonHeight={420}
+	>
+		<Progress system={profile.measurementSystem} />
 	</Section>
 
 	<Section

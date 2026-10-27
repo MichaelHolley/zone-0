@@ -1,5 +1,6 @@
 import { barY, colorLegend, defineChart, dot, lineY, link, ruleY } from '@tanstack/charts';
 import { decorative } from '@tanstack/charts/mark/decorative';
+import { linearRegressionRowsY, linearRegressionY } from '@tanstack/charts/regression';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
@@ -28,6 +29,7 @@ import {
 import type {
 	getCycling,
 	getIntensityAndLoad,
+	getProgress,
 	getRunning,
 	getStrength,
 	getWeeklyVolume
@@ -43,6 +45,7 @@ export type Ride = Cycling['rides'][number];
 type Strength = Resolved<typeof getStrength>;
 export type StrengthSession = Strength['sessions'][number];
 type Run = Resolved<typeof getRunning>['runs'][number];
+type Progress = Resolved<typeof getProgress>;
 
 const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const monthTick = (value: Date) => monthFormat.format(value);
@@ -355,6 +358,9 @@ export function rideClimbChart(rides: Ride[], system: MeasurementSystem) {
 	});
 }
 
+const toPace = (metersPerSecond: number, system: MeasurementSystem) =>
+	3600 / toSpeed(metersPerSecond, system);
+
 export const RUN_SYMBOLS = [
 	{ label: 'Outdoor', color: SPORT_COLOR.running },
 	{ label: 'Treadmill', color: SPORT_COLOR.running, hollow: true }
@@ -370,7 +376,7 @@ export function paceChart(runs: Run[], system: MeasurementSystem) {
 						kind,
 						heartRate,
 						pace: movingSeconds / toDistance(distance, system),
-						topPace: maxSpeed ? 3600 / toSpeed(maxSpeed, system) : null
+						topPace: maxSpeed ? toPace(maxSpeed, system) : null
 					}
 				]
 			: []
@@ -493,4 +499,82 @@ export function zoneShareChart(rows: Cycling['zones']) {
 			};
 		})
 	);
+}
+
+export type ProgressPoint = { date: Date; kind: string; value: number; detail: string };
+
+export function progressTrend(points: ProgressPoint[]) {
+	const [first, last] = linearRegressionRowsY(points, { x: 'date', y: 'value', samples: 2 });
+	return first && last ? { since: first.x, from: first.y, to: last.y } : null;
+}
+
+export function rideProgress(
+	rides: Progress['cycling']['efforts'],
+	referenceHr: number,
+	system: MeasurementSystem
+): ProgressPoint[] {
+	const unit = speedUnit(system);
+	return rides.map((ride) => ({
+		date: utcDate(ride.date),
+		kind: ride.kind,
+		value: toSpeed(ride.normalizedSpeed, system),
+		detail: [
+			`${longDate(utcDate(ride.date))} (${ride.kind})`,
+			`${formatNumber(toSpeed(ride.normalizedSpeed, system), 1)} ${unit} at ${referenceHr} bpm`,
+			`Rode ${formatNumber(toSpeed(ride.speed, system), 1)} ${unit} at ${formatNumber(ride.heartRate)} bpm`,
+			`${formatNumber(toDistance(ride.distance, system), 1)} ${distanceUnit(system)}, ${formatNumber(toElevation(ride.elevation, system))} ${elevationUnit(system)} climbed`
+		].join('\n')
+	}));
+}
+
+export function runProgress(
+	runs: Progress['running']['efforts'],
+	referenceHr: number,
+	system: MeasurementSystem
+): ProgressPoint[] {
+	const unit = `/${distanceUnit(system)}`;
+	return runs.map((run) => ({
+		date: utcDate(run.date),
+		kind: run.kind,
+		value: toPace(run.normalizedSpeed, system),
+		detail: [
+			`${longDate(utcDate(run.date))} (${run.kind})`,
+			`${formatClock(toPace(run.normalizedSpeed, system))} ${unit} at ${referenceHr} bpm`,
+			`Ran ${formatClock(toPace(run.speed, system))} ${unit} at ${formatNumber(run.heartRate)} bpm`,
+			`${formatNumber(toDistance(run.distance, system), 1)} ${distanceUnit(system)}`
+		].join('\n')
+	}));
+}
+
+export function progressChart(
+	points: ProgressPoint[],
+	{ color, hollowKind, pace = false }: { color: string; hollowKind: string; pace?: boolean }
+) {
+	return defineChart({
+		marks: [
+			decorative(
+				linearRegressionY(points, { x: 'date', y: 'value', stroke: color, strokeWidth: 2 })
+			),
+			dot(points, { x: 'date', y: 'value', fill: color, fillOpacity: 0.85, r: DOT_RADIUS }),
+			decorative(
+				dot(
+					points.filter((point) => point.kind === hollowKind),
+					{ x: 'date', y: 'value', fill: '#ffffff', r: DOT_RADIUS - 2 }
+				)
+			)
+		],
+		scales: {
+			x: weekAxis,
+			y: {
+				...valueAxis,
+				nice: true,
+				reverse: pace,
+				axis: pace
+					? { ...valueAxis.axis, ticks: { ...valueAxis.axis.ticks, format: formatClock } }
+					: valueAxis.axis
+			}
+		},
+		theme: chartTheme,
+		tooltip: { use: tooltip, format: (p) => p.datum.detail }
+	});
 }
