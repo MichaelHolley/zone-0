@@ -16,7 +16,6 @@ const rideKind = (typeKey = '') =>
 	typeKey.includes('indoor') ? 'Indoor' : typeKey.includes('gravel') ? 'Gravel' : 'Road';
 
 const HR_ZONES = [1, 2, 3, 4, 5] as const;
-const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 const RUNNING_BESTS = [
 	{ meters: 1000, label: '1 km' },
 	{ meters: 1609, label: '1 mile' },
@@ -132,7 +131,7 @@ export const getRunningBests = query(async () => {
 });
 
 export const getStrength = query(async () => {
-	const { activities, weeks, weekOf, settings } = await lastYear();
+	const { activities, weeks, weekOf } = await lastYear();
 	const sessions = activities.filter((a) => sportOf(a) === 'strength');
 	const byWeek = groupByWeek(sessions, weekOf);
 
@@ -151,14 +150,6 @@ export const getStrength = query(async () => {
 
 	return {
 		consistency: { activeWeeks, totalWeeks: weeks.length, longestStreak },
-		weekdays: Array.from({ length: 7 }, (_, offset) => {
-			const day = (settings.firstDayOfWeek + offset) % 7;
-			return {
-				label: WEEKDAY_LABELS[day],
-				count: sessions.filter((a) => utcDate(activityDate(a)).getUTCDay() === day).length
-			};
-		}),
-		zones: zoneSeconds(sessions),
 		sessions: sessions
 			.map((a) => ({
 				date: activityDate(a),

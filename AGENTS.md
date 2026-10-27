@@ -40,6 +40,10 @@ Use conventional commit messages like 'feat:', 'fix:', 'chore:', ...
 Use `package.json` scripts over `pnpx` and `npx` commands.
 Validate your changes with `pnpm run check`.
 
+## Removing Features
+
+Free resources that are no longer used. When removing a chart or feature, also remove the data fetching, queries and API calls behind it, even if the data is simply left unused.
+
 ## Testing
 
 This is a template for vibe projects - you must not write any tests.

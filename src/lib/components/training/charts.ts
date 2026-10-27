@@ -411,17 +411,6 @@ function categoryChart(bars: CategoryBar[]) {
 	});
 }
 
-export function weekdayChart(rows: Strength['weekdays']) {
-	return categoryChart(
-		rows.map(({ label, count }) => ({
-			label,
-			value: count,
-			color: SPORT_COLOR.strength,
-			detail: `${formatNumber(count)} ${count === 1 ? 'session' : 'sessions'}`
-		}))
-	);
-}
-
 export function zoneShareChart(rows: Cycling['zones']) {
 	const total = sum(rows.map((row) => row.seconds));
 	return categoryChart(
