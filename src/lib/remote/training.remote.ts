@@ -166,17 +166,21 @@ export const getStrength = query(async () => {
 
 export const getRunning = query(async () => {
 	const { activities } = await lastYear();
-	return activities
-		.filter((a) => sportOf(a) === 'running')
-		.map((a) => ({
-			date: activityDate(a),
-			kind: a.activityType?.typeKey?.includes('treadmill') ? 'Treadmill' : 'Outdoor',
-			distance: a.distance ?? 0,
-			movingSeconds: a.movingDuration ?? a.duration ?? 0,
-			heartRate: a.averageHR ?? null,
-			cadence: a.averageRunningCadenceInStepsPerMinute ?? null
-		}))
-		.toSorted((a, b) => a.date.localeCompare(b.date));
+	const runs = activities.filter((a) => sportOf(a) === 'running');
+	return {
+		zones: zoneSeconds(runs),
+		runs: runs
+			.map((a) => ({
+				date: activityDate(a),
+				kind: a.activityType?.typeKey?.includes('treadmill') ? 'Treadmill' : 'Outdoor',
+				distance: a.distance ?? 0,
+				movingSeconds: a.movingDuration ?? a.duration ?? 0,
+				maxSpeed: a.maxSpeed ?? null,
+				heartRate: a.averageHR ?? null,
+				cadence: a.averageRunningCadenceInStepsPerMinute ?? null
+			}))
+			.toSorted((a, b) => a.date.localeCompare(b.date))
+	};
 });
 
 export const getCycling = query(async () => {

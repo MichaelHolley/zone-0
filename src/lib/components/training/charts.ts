@@ -1,4 +1,4 @@
-import { barY, colorLegend, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
+import { barY, colorLegend, defineChart, dot, lineY, link, ruleY } from '@tanstack/charts';
 import { decorative } from '@tanstack/charts/mark/decorative';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -15,6 +15,7 @@ import {
 import {
 	distanceUnit,
 	elevationUnit,
+	formatClock,
 	formatLongDate,
 	formatNumber,
 	speedUnit,
@@ -27,6 +28,7 @@ import {
 import type {
 	getCycling,
 	getIntensityAndLoad,
+	getRunning,
 	getStrength,
 	getWeeklyVolume
 } from '#lib/remote/training.remote.js';
@@ -40,6 +42,7 @@ type Cycling = Resolved<typeof getCycling>;
 export type Ride = Cycling['rides'][number];
 type Strength = Resolved<typeof getStrength>;
 export type StrengthSession = Strength['sessions'][number];
+type Run = Resolved<typeof getRunning>['runs'][number];
 
 const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const monthTick = (value: Date) => monthFormat.format(value);
@@ -352,13 +355,79 @@ export function rideClimbChart(rides: Ride[], system: MeasurementSystem) {
 	});
 }
 
+export const RUN_SYMBOLS = [
+	{ label: 'Outdoor', color: SPORT_COLOR.running },
+	{ label: 'Treadmill', color: SPORT_COLOR.running, hollow: true }
+] as const;
+
+export function paceChart(runs: Run[], system: MeasurementSystem) {
+	const unit = distanceUnit(system);
+	const data = runs.flatMap(({ date, kind, distance, movingSeconds, maxSpeed, heartRate }) =>
+		distance > 0
+			? [
+					{
+						date: utcDate(date),
+						kind,
+						heartRate,
+						pace: movingSeconds / toDistance(distance, system),
+						topPace: maxSpeed ? 3600 / toSpeed(maxSpeed, system) : null
+					}
+				]
+			: []
+	);
+	const withTopPace = data.flatMap((run) =>
+		run.topPace == null ? [] : [{ ...run, topPace: run.topPace }]
+	);
+	return defineChart({
+		marks: [
+			link(withTopPace, {
+				x1: 'date',
+				y1: 'pace',
+				x2: 'date',
+				y2: 'topPace',
+				stroke: SPORT_COLOR.running,
+				strokeOpacity: 0.25,
+				strokeWidth: 2 * DOT_RADIUS
+			}),
+			dot(data, { x: 'date', y: 'pace', fill: SPORT_COLOR.running, r: DOT_RADIUS }),
+			decorative(
+				dot(
+					data.filter((run) => run.kind === 'Treadmill'),
+					{ x: 'date', y: 'pace', fill: '#ffffff', r: DOT_RADIUS - 2 }
+				)
+			)
+		],
+		scales: {
+			x: weekAxis,
+			y: {
+				...valueAxis,
+				nice: true,
+				reverse: true,
+				axis: { ...valueAxis.axis, ticks: { ...valueAxis.axis.ticks, format: formatClock } }
+			}
+		},
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: (p) =>
+				[
+					`${longDate(p.datum.date)} (${p.datum.kind})`,
+					`Average ${formatClock(p.datum.pace)} /${unit}`,
+					p.datum.topPace == null ? null : `Top ${formatClock(p.datum.topPace)} /${unit}`,
+					p.datum.heartRate == null ? null : `${formatNumber(p.datum.heartRate)} bpm`
+				]
+					.filter((line) => line != null)
+					.join('\n')
+		}
+	});
+}
+
 const TREND_WINDOW = 10;
 
 export function sessionTrendChart<T extends { date: string }>(
 	sessions: T[],
 	pick: (session: T) => number | null,
-	format: (value: number) => string,
-	color = SPORT_COLOR.strength
+	format: (value: number) => string
 ) {
 	const points = sessions.flatMap((session) => {
 		const value = pick(session);
@@ -370,8 +439,8 @@ export function sessionTrendChart<T extends { date: string }>(
 	});
 	return defineChart({
 		marks: [
-			dot(rows, { x: 'date', y: 'value', fill: color, fillOpacity: 0.3, r: 3 }),
-			lineY(rows, { x: 'date', y: 'average', stroke: color, strokeWidth: 2 })
+			dot(rows, { x: 'date', y: 'value', fill: SPORT_COLOR.strength, fillOpacity: 0.3, r: 3 }),
+			lineY(rows, { x: 'date', y: 'average', stroke: SPORT_COLOR.strength, strokeWidth: 2 })
 		],
 		scales: {
 			x: weekAxis,
