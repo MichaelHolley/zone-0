@@ -9,7 +9,7 @@
 	import { formatDuration, formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getStrength } from '#lib/remote/training.remote.js';
 	import { average, sum } from '#lib/stats.js';
-	import { sessionTrendChart, weekdayChart, zoneShareChart } from './charts.js';
+	import { sessionTrendChart } from './charts.js';
 
 	const columns = [
 		{ label: 'Date' },
@@ -77,22 +77,6 @@
 					(v) => `${formatNumber(v)} bpm`
 				)}
 				ariaLabel="Average heart rate of each strength session, last 12 months"
-				height={200}
-			/>
-		</Panel>
-
-		<Panel title="Sessions by weekday">
-			<Chart
-				definition={weekdayChart(data.weekdays)}
-				ariaLabel="Strength sessions by day of the week, last 12 months"
-				height={200}
-			/>
-		</Panel>
-
-		<Panel title="Time in heart rate zones (%)">
-			<Chart
-				definition={zoneShareChart(data.zones)}
-				ariaLabel="Share of strength training time in each heart rate zone, last 12 months"
 				height={200}
 			/>
 		</Panel>
