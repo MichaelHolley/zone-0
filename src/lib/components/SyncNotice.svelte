@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { refreshAll } from '$app/navigation';
 	import WarningCircleIcon from 'phosphor-svelte/lib/WarningCircleIcon';
-	import { STORE_QUERIES } from '#lib/remote/store-queries.js';
 	import { getSyncStatus, syncWithGarmin } from '#lib/remote/sync.remote.js';
 
 	let { timeZone }: { timeZone: string } = $props();
@@ -11,7 +11,7 @@
 	onMount(() => {
 		// Failures already reach the user through the sections and this notice.
 		syncWithGarmin()
-			.updates(...STORE_QUERIES)
+			.then((synced) => (synced ? refreshAll() : getSyncStatus().refresh()))
 			.catch(() => {});
 	});
 </script>

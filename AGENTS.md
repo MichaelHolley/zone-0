@@ -30,6 +30,14 @@ There is no stable URL for the OpenAPI JSON. The Swagger page embeds the spec (O
 
 The spec lives at `src/lib/server/garmin/openapi.json`. After updating it, regenerate `schema.d.ts` with `pnpm run garmin:types`.
 
+## Data Sync
+
+Pages render from the local store first. `SyncNotice` then starts a background sync and, when new data arrives, calls `refreshAll()` so every active query on the page refreshes. A new query that reads the store needs no registration, but a new page that shows store data must render `SyncNotice`. Don't reintroduce a hand-kept list of queries to refresh; one already drifted and left a section stale.
+
+## Deployment
+
+The app has no authentication of its own. It is expected to run behind a basic auth middleware (e.g. a reverse proxy), so don't add login or auth handling to the app.
+
 ## Git
 
 Work on `main`, unless explicitly told to work on a feature branch.
