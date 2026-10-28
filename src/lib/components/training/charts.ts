@@ -386,8 +386,8 @@ export function paceChart(runs: Run[], system: MeasurementSystem) {
 				x2: 'date',
 				y2: 'topPace',
 				stroke: SPORT_COLOR.running,
-				strokeOpacity: 0.25,
-				strokeWidth: 2 * DOT_RADIUS
+				strokeOpacity: 0.6,
+				strokeWidth: 1.5
 			}),
 			dot(data, { x: 'date', y: 'pace', fill: SPORT_COLOR.running, r: DOT_RADIUS }),
 			decorative(
