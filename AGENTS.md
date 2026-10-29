@@ -30,6 +30,10 @@ There is no stable URL for the OpenAPI JSON. The Swagger page embeds the spec (O
 
 The spec lives at `src/lib/server/garmin/openapi.json`. After updating it, regenerate `schema.d.ts` with `pnpm run garmin:types`.
 
+## Deployment
+
+The app has no authentication of its own. It is expected to run behind a basic auth middleware (e.g. a reverse proxy), so don't add login or auth handling to the app.
+
 ## Git
 
 Work on `main`, unless explicitly told to work on a feature branch.
