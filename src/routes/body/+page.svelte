@@ -23,5 +23,9 @@
 		skeletonHeight={280}
 	>
 		<FitnessAge />
+		<p class="mt-3 text-sm text-ash">
+			Vigorous activity is exercise intense enough that you can only say a few words before pausing
+			for breath, such as running or fast cycling. Garmin estimates it from your heart rate.
+		</p>
 	</Section>
 </div>
