@@ -22,19 +22,11 @@
 		<WeeklyVolume system={profile.measurementSystem} />
 	</Section>
 
-	<Section
-		title="Intensity and load"
-		description="Dashed line: weekly intensity goal"
-		skeletonHeight={440}
-	>
+	<Section title="Intensity and load" skeletonHeight={440}>
 		<IntensityLoad />
 	</Section>
 
-	<Section
-		title="Strength"
-		description="Line: average of the last 10 sessions"
-		skeletonHeight={900}
-	>
+	<Section title="Strength" skeletonHeight={900}>
 		<Strength />
 	</Section>
 
