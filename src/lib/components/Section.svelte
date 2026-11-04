@@ -4,12 +4,14 @@
 	import { errorMessage, isKeyError } from '#lib/errors.js';
 
 	let {
+		id,
 		title,
 		description,
 		skeletonHeight = 240,
 		children,
 		class: className
 	}: {
+		id?: string;
 		title?: string;
 		description?: string;
 		skeletonHeight?: number;
@@ -22,7 +24,7 @@
 	}
 </script>
 
-<section class={className}>
+<section {id} tabindex="-1" aria-label={id ? title : undefined} class={className}>
 	{#if title}
 		<header class="mb-5">
 			<h2 class="text-[22px] leading-tight font-semibold tracking-tight">{title}</h2>
