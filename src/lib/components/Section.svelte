@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import WarningCircleIcon from 'phosphor-svelte/lib/WarningCircleIcon';
+	import SportIcon from '#lib/components/SportIcon.svelte';
 	import { errorMessage, isKeyError } from '#lib/errors.js';
+	import type { Sport } from '#lib/sport.js';
 
 	let {
 		id,
 		title,
 		description,
+		sport,
 		skeletonHeight = 240,
 		children,
 		class: className
@@ -14,6 +17,7 @@
 		id?: string;
 		title?: string;
 		description?: string;
+		sport?: Sport;
 		skeletonHeight?: number;
 		children: Snippet;
 		class?: string;
@@ -26,9 +30,12 @@
 
 <section {id} tabindex="-1" aria-label={id ? title : undefined} class={className}>
 	{#if title}
-		<header class="mb-5">
-			<h2 class="text-[22px] leading-tight font-semibold tracking-tight">{title}</h2>
-			{#if description}<p class="mt-1 text-[15px] text-ash">{description}</p>{/if}
+		<header class="mb-5 flex items-center gap-3">
+			{#if sport}<SportIcon {sport} size={18} />{/if}
+			<div>
+				<h2 class="text-[22px] leading-tight font-semibold tracking-tight">{title}</h2>
+				{#if description}<p class="mt-1 text-[15px] text-ash">{description}</p>{/if}
+			</div>
 		</header>
 	{/if}
 	<svelte:boundary onerror={rethrowKeyError}>
