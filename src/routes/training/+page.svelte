@@ -20,7 +20,7 @@
 
 <TrainingNav />
 
-<div class="space-y-14 [--training-scroll-offset:calc(var(--app-header-height)+6.5rem)]">
+<div class="space-y-14 [--training-scroll-offset:calc(var(--app-header-height)+6rem)]">
 	<section
 		id="overall"
 		aria-label="Overall"

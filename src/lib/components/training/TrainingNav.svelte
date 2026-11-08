@@ -58,20 +58,29 @@
 	aria-label="Training sections"
 	class="sticky top-(--app-header-height) z-20 mb-8 bg-white py-3"
 >
-	<ul class="grid grid-cols-4 gap-1 rounded-xl border border-line-strong bg-mist p-1 sm:flex">
+	<ul
+		class="grid grid-cols-4 gap-1 border-b border-line-strong bg-mist px-3 sm:flex sm:gap-8 sm:px-4"
+	>
 		{#each sections as section (section.id)}
 			<li>
 				<a
 					href="#{section.id}"
 					aria-current={active === section.id ? 'location' : undefined}
 					class={[
-						'block rounded-lg border-b-2 px-1 py-3 text-center text-sm font-semibold sm:px-5',
-						active === section.id
-							? 'border-accent-ink bg-white text-accent-ink'
-							: 'border-transparent text-ash hover:bg-white hover:text-ink'
+						'group -mb-px block text-center text-sm font-semibold',
+						active === section.id ? 'text-ink' : 'text-ash hover:text-ink'
 					]}
 				>
-					{section.label}
+					<span
+						class={[
+							'inline-block border-b-2 py-3',
+							active === section.id
+								? 'border-ink'
+								: 'border-transparent group-hover:border-line-strong'
+						]}
+					>
+						{section.label}
+					</span>
 				</a>
 			</li>
 		{/each}
