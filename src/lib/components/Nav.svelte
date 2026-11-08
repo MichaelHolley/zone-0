@@ -9,9 +9,10 @@
 	] as const;
 </script>
 
-<header class="sticky top-0 z-10 border-b border-line bg-white">
+<header class="sticky top-0 z-30 h-(--app-header-height) border-b border-line bg-white">
 	<nav
-		class="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4 px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:px-8"
+		aria-label="Main"
+		class="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:grid md:grid-cols-[1fr_auto_1fr] md:px-8"
 	>
 		<a href={resolve('/')} class="text-xl font-bold tracking-tight text-accent">zone-0</a>
 		<ul
@@ -24,7 +25,7 @@
 						href={link.href}
 						aria-current={active ? 'page' : undefined}
 						class={[
-							'block rounded-full px-4 py-2 font-semibold transition-colors',
+							'block rounded-full px-3 py-2 font-semibold transition-colors sm:px-4',
 							active ? 'bg-ink text-white' : 'text-ash hover:bg-mist hover:text-ink'
 						]}
 					>

@@ -56,19 +56,19 @@
 <nav
 	{@attach trackSections}
 	aria-label="Training sections"
-	class="sticky top-20 z-10 mb-8 border-b border-line bg-white"
+	class="sticky top-(--app-header-height) z-20 mb-8 bg-white py-3"
 >
-	<ul class="grid grid-cols-4 gap-1 sm:flex sm:gap-8">
+	<ul class="grid grid-cols-4 gap-1 rounded-xl border border-line-strong bg-mist p-1 sm:flex">
 		{#each sections as section (section.id)}
 			<li>
 				<a
 					href="#{section.id}"
 					aria-current={active === section.id ? 'location' : undefined}
 					class={[
-						'block border-b-2 px-1 py-4 text-center text-sm font-semibold sm:px-0',
+						'block rounded-lg border-b-2 px-1 py-3 text-center text-sm font-semibold sm:px-5',
 						active === section.id
-							? 'border-ink text-ink'
-							: 'border-transparent text-ash hover:border-line-strong hover:text-ink'
+							? 'border-accent-ink bg-white text-accent-ink'
+							: 'border-transparent text-ash hover:bg-white hover:text-ink'
 					]}
 				>
 					{section.label}

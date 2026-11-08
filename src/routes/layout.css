@@ -15,6 +15,7 @@
 
 :root {
 	color-scheme: light;
+	--app-header-height: 5rem;
 	--ts-chart-tooltip-background: #ffffff;
 	--ts-chart-tooltip-color: #222222;
 	--ts-chart-tooltip-border: none;

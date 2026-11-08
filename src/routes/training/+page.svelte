@@ -20,8 +20,13 @@
 
 <TrainingNav />
 
-<div class="space-y-14">
-	<section id="overall" aria-label="Overall" tabindex="-1" class="scroll-mt-40 space-y-14">
+<div class="space-y-14 [--training-scroll-offset:calc(var(--app-header-height)+6.5rem)]">
+	<section
+		id="overall"
+		aria-label="Overall"
+		tabindex="-1"
+		class="scroll-mt-(--training-scroll-offset) space-y-14"
+	>
 		<Section title="Weekly volume" skeletonHeight={320}>
 			<WeeklyVolume system={profile.measurementSystem} />
 		</Section>
@@ -31,15 +36,30 @@
 		</Section>
 	</section>
 
-	<Section id="strength" title="Strength" skeletonHeight={900} class="scroll-mt-40">
+	<Section
+		id="strength"
+		title="Strength"
+		skeletonHeight={900}
+		class="scroll-mt-(--training-scroll-offset)"
+	>
 		<Strength />
 	</Section>
 
-	<Section id="cycling" title="Cycling" skeletonHeight={520} class="scroll-mt-40">
+	<Section
+		id="cycling"
+		title="Cycling"
+		skeletonHeight={520}
+		class="scroll-mt-(--training-scroll-offset)"
+	>
 		<Cycling system={profile.measurementSystem} />
 	</Section>
 
-	<Section id="running" title="Running" skeletonHeight={480} class="scroll-mt-40">
+	<Section
+		id="running"
+		title="Running"
+		skeletonHeight={480}
+		class="scroll-mt-(--training-scroll-offset)"
+	>
 		<Running system={profile.measurementSystem} />
 	</Section>
 </div>
