@@ -54,7 +54,7 @@ This is a template for vibe projects - you must not write any tests.
 
 ## README
 
-Keep `README.md` in sync when a change alters what the app shows, how it works, or how to set it up. Update only the affected lines, keep it short, and don't turn it into a changelog or feature catalogue.
+Update `README.md` only when a change alters what data the app displays, how it works, or how to set it up. Purely visual or UI changes (navigation, layout, styling, icons) don't belong in it. Update only the affected lines, keep it short, and don't turn it into a changelog or feature catalogue.
 
 ## Documentation
 
