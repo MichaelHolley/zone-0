@@ -24,6 +24,15 @@
 
 	let activeSection = $state('overall');
 
+	function scrollToSection(event: MouseEvent, id: string) {
+		const target = document.getElementById(id);
+		if (!target) return;
+		event.preventDefault();
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+		target.focus({ preventScroll: true });
+	}
+
 	function trackSections(list: HTMLElement) {
 		const header = list.closest('header')!;
 		let frame = 0;
@@ -120,6 +129,7 @@
 										<li>
 											<a
 												href="#{section.id}"
+												onclick={(event) => scrollToSection(event, section.id)}
 												aria-label={section.label}
 												title={section.label}
 												aria-current={current ? 'location' : undefined}
