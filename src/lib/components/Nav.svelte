@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { replaceState } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import BarbellIcon from 'phosphor-svelte/lib/BarbellIcon';
@@ -23,6 +24,16 @@
 	];
 
 	let activeSection = $state('overall');
+
+	function scrollToSection(event: MouseEvent, id: string) {
+		const target = document.getElementById(id);
+		if (!target) return;
+		event.preventDefault();
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+		replaceState(`#${id}`, page.state);
+		target.focus({ preventScroll: true });
+	}
 
 	function trackSections(list: HTMLElement) {
 		const header = list.closest('header')!;
@@ -120,6 +131,7 @@
 										<li>
 											<a
 												href="#{section.id}"
+												onclick={(event) => scrollToSection(event, section.id)}
 												aria-label={section.label}
 												title={section.label}
 												aria-current={current ? 'location' : undefined}
