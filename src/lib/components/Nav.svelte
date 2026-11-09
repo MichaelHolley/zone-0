@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { replaceState } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import BarbellIcon from 'phosphor-svelte/lib/BarbellIcon';
@@ -31,7 +30,6 @@
 		event.preventDefault();
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-		replaceState(`#${id}`, page.state);
 		target.focus({ preventScroll: true });
 	}
 
