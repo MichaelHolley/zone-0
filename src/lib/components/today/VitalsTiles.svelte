@@ -3,7 +3,7 @@
 	import Tile from '#lib/components/Tile.svelte';
 	import { formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getVitals } from '#lib/remote/today.remote.js';
-	import { areaTrend, barTrend, heartRateTrend, lineTrend, rangeTrend } from './trends.js';
+	import { areaTrend, barTrend, heartRateTrend, lineTrend, rechargeTrend } from './trends.js';
 
 	let { today }: { today: string } = $props();
 
@@ -76,8 +76,8 @@
 			Charged {show(vitals.bodyBattery.charged)}, drained {show(vitals.bodyBattery.drained)}
 		{/snippet}
 		<Chart
-			definition={rangeTrend(trend)}
-			ariaLabel="Body battery daily range, last 28 days"
+			definition={rechargeTrend(trend)}
+			ariaLabel="Body battery overnight recharge from previous bedtime low to morning peak, last 28 days"
 			height={CHART_HEIGHT}
 		/>
 	</Tile>

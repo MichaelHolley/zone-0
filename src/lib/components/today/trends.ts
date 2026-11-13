@@ -71,26 +71,41 @@ export function areaTrend(rows: TrendRow[], key: NumericKey, unit: string) {
 	});
 }
 
-export function rangeTrend(rows: TrendRow[]) {
+export function rechargeTrend(rows: TrendRow[]) {
+	const rechargeRows = rows.map((row, index) => {
+		const previous = rows[index - 1];
+		return {
+			date: row.date,
+			bedtimeLow:
+				previous && row.date.getTime() - previous.date.getTime() === DAY_MS
+					? previous.bodyBatteryLow
+					: null,
+			morningPeak: row.bodyBatteryHigh
+		};
+	});
+
 	return defineChart({
 		marks: [
-			areaY(rows, {
+			barY(rechargeRows, {
 				x: 'date',
-				y1: 'bodyBatteryLow',
-				y2: 'bodyBatteryHigh',
+				y1: 'bedtimeLow',
+				y2: 'morningPeak',
 				fill: ACCENT,
-				fillOpacity: 0.25
-			}),
-			lineY(rows, { x: 'date', y: 'bodyBatteryHigh', stroke: ACCENT, strokeWidth: 1.5 })
+				fillOpacity: 0.85,
+				radius: 2
+			})
 		],
-		scales: axes(...bounds(rows)),
+		scales: barAxes(rows),
 		theme: chartTheme,
 		tooltip: {
 			use: tooltip,
-			format: (p) =>
-				p.datum.bodyBatteryHigh == null
-					? `${formatShortDate(p.datum.date)}\nNo data`
-					: `${formatShortDate(p.datum.date)}\nHigh ${p.datum.bodyBatteryHigh}, low ${p.datum.bodyBatteryLow}`
+			format: ({ datum: { date, bedtimeLow, morningPeak } }) => {
+				if (bedtimeLow == null || morningPeak == null) {
+					return `${formatShortDate(date)}\nNo data`;
+				}
+				const recharge = morningPeak - bedtimeLow;
+				return `${formatShortDate(date)}\nBedtime low ${bedtimeLow} → morning peak ${morningPeak}\nRecharge ${recharge >= 0 ? '+' : ''}${recharge}`;
+			}
 		}
 	});
 }
