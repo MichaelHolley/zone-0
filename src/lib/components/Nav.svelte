@@ -10,7 +10,7 @@
 	const trainingHref = resolve('/training');
 
 	const links = [
-		{ href: resolve('/'), label: 'Today' },
+		{ href: resolve('/'), label: 'Pulse' },
 		{ href: trainingHref, label: 'Training' },
 		{ href: resolve('/body'), label: 'Body' }
 	] as const;

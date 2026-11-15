@@ -4,7 +4,7 @@ import { tooltip } from '@tanstack/charts/tooltip';
 import { scaleUtc } from 'd3-scale';
 import { ACCENT, chartTheme, DAY_MS, dateTick, paddedTimeScale } from '#lib/charts.js';
 import { formatNumber, formatShortDate } from '#lib/format.js';
-import type { getVitals } from '#lib/remote/today.remote.js';
+import type { getVitals } from '#lib/remote/pulse.remote.js';
 
 type TrendRow = Awaited<ReturnType<typeof getVitals>>['trend'][number];
 type NumericKey = {

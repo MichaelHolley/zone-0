@@ -7,7 +7,7 @@
 		formatDuration,
 		type MeasurementSystem
 	} from '#lib/format.js';
-	import { getWeekWorkouts } from '#lib/remote/today.remote.js';
+	import { getWeekWorkouts } from '#lib/remote/pulse.remote.js';
 	import { sum } from '#lib/stats.js';
 
 	let { system }: { system: MeasurementSystem } = $props();

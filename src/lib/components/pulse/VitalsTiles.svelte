@@ -2,7 +2,7 @@
 	import { Chart } from '@tanstack/charts/svelte';
 	import Tile from '#lib/components/Tile.svelte';
 	import { formatLongDate, formatNumber, orDash } from '#lib/format.js';
-	import { getVitals } from '#lib/remote/today.remote.js';
+	import { getVitals } from '#lib/remote/pulse.remote.js';
 	import { areaTrend, barTrend, heartRateTrend, lineTrend, rechargeTrend } from './trends.js';
 
 	let { today }: { today: string } = $props();

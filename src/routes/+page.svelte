@@ -2,17 +2,17 @@
 	import PageHeader from '#lib/components/PageHeader.svelte';
 	import Section from '#lib/components/Section.svelte';
 	import SyncNotice from '#lib/components/SyncNotice.svelte';
-	import VitalsTiles from '#lib/components/today/VitalsTiles.svelte';
-	import WeekWorkouts from '#lib/components/today/WeekWorkouts.svelte';
+	import VitalsTiles from '#lib/components/pulse/VitalsTiles.svelte';
+	import WeekWorkouts from '#lib/components/pulse/WeekWorkouts.svelte';
 	import { formatLongDate } from '#lib/format.js';
 	import { getProfile } from '#lib/remote/profile.remote.js';
 
 	const profile = await getProfile();
 </script>
 
-<svelte:head><title>Today | zone-0</title></svelte:head>
+<svelte:head><title>Pulse | zone-0</title></svelte:head>
 
-<PageHeader title="Today" subtitle={formatLongDate(profile.today)} />
+<PageHeader title="Pulse" subtitle={formatLongDate(profile.today)} />
 <SyncNotice timeZone={profile.timeZone} />
 
 <div class="space-y-14">

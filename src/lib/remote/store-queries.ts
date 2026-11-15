@@ -1,5 +1,5 @@
 import type { RemoteQueryFunction } from '$app/server';
-import { getVitals, getWeekWorkouts } from '#lib/remote/today.remote.js';
+import { getVitals, getWeekWorkouts } from '#lib/remote/pulse.remote.js';
 import {
 	getCycling,
 	getIntensityAndLoad,

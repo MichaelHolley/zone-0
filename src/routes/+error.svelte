@@ -38,7 +38,7 @@
 			href={resolve('/')}
 			class="mt-6 inline-block font-semibold text-ink underline underline-offset-2"
 		>
-			Back to today
+			Back to Pulse
 		</a>
 	{/if}
 </div>
