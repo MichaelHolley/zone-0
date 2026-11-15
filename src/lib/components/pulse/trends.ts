@@ -110,6 +110,24 @@ export function rechargeTrend(rows: TrendRow[]) {
 	});
 }
 
+export function stressTrend(rows: TrendRow[]) {
+	return defineChart({
+		marks: [
+			barY(rows, { x: 'date', y: 'stressMax', fill: ACCENT, fillOpacity: 0.2, radius: { end: 2 } }),
+			lineY(rows, { x: 'date', y: 'stressAvg', stroke: ACCENT, strokeWidth: 1.75 })
+		],
+		scales: barAxes(rows),
+		theme: chartTheme,
+		tooltip: {
+			use: tooltip,
+			format: ({ datum }) =>
+				datum.stressAvg == null
+					? `${formatShortDate(datum.date)}\nNo data`
+					: `${formatShortDate(datum.date)}\nAvg ${datum.stressAvg}, max ${datum.stressMax ?? '–'}`
+		}
+	});
+}
+
 export function heartRateTrend(rows: TrendRow[], sevenDayAvg: number | null) {
 	return defineChart({
 		marks: [

@@ -3,7 +3,14 @@
 	import Tile from '#lib/components/Tile.svelte';
 	import { formatLongDate, formatNumber, orDash } from '#lib/format.js';
 	import { getVitals } from '#lib/remote/pulse.remote.js';
-	import { areaTrend, barTrend, heartRateTrend, lineTrend, rechargeTrend } from './trends.js';
+	import {
+		areaTrend,
+		barTrend,
+		heartRateTrend,
+		lineTrend,
+		rechargeTrend,
+		stressTrend
+	} from './trends.js';
 
 	let { today }: { today: string } = $props();
 
@@ -58,8 +65,8 @@
 	<Tile label="Stress" value={show(vitals.stress.avg)} unit="avg" class="lg:col-span-2">
 		{#snippet detail()}Max {show(vitals.stress.max)}{/snippet}
 		<Chart
-			definition={barTrend(trend, 'stressAvg', 'avg stress')}
-			ariaLabel="Average stress, last 28 days"
+			definition={stressTrend(trend)}
+			ariaLabel="Daily average and max stress, last 28 days"
 			height={CHART_HEIGHT}
 		/>
 	</Tile>

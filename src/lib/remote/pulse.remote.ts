@@ -83,6 +83,7 @@ export const getVitals = query(async () => {
 				hrLow: measured(s.heartRate?.minValue),
 				hrHigh: measured(s.heartRate?.maxValue),
 				stressAvg: measured(s.stress?.avgLevel),
+				stressMax: measured(s.stress?.maxLevel),
 				bodyBatteryLow: measured(s.bodyBattery?.minValue),
 				bodyBatteryHigh: measured(s.bodyBattery?.maxValue),
 				intensity: weightedIntensityMinutes(s),
