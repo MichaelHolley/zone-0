@@ -3,7 +3,7 @@
 	import Section from '#lib/components/Section.svelte';
 	import SyncNotice from '#lib/components/SyncNotice.svelte';
 	import VitalsTiles from '#lib/components/pulse/VitalsTiles.svelte';
-	import WeekWorkouts from '#lib/components/pulse/WeekWorkouts.svelte';
+	import RecentWorkouts from '#lib/components/pulse/RecentWorkouts.svelte';
 	import { formatLongDate } from '#lib/format.js';
 	import { getProfile } from '#lib/remote/profile.remote.js';
 
@@ -24,7 +24,7 @@
 		<VitalsTiles today={profile.today} />
 	</Section>
 
-	<Section title="This week" skeletonHeight={180}>
-		<WeekWorkouts system={profile.measurementSystem} />
+	<Section title="Past 7 days" skeletonHeight={180}>
+		<RecentWorkouts system={profile.measurementSystem} />
 	</Section>
 </div>

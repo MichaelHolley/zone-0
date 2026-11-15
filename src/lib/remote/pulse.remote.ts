@@ -93,10 +93,9 @@ export const getVitals = query(async () => {
 	};
 });
 
-export const getWeekWorkouts = query(async () => {
-	const { settings, today } = await getToday();
-	const start = weekStart(today, settings.firstDayOfWeek);
-	const activities = await getActivities(start, today);
+export const getRecentWorkouts = query(async () => {
+	const { today } = await getToday();
+	const activities = await getActivities(addDays(today, -6), today);
 
 	return activities
 		.toSorted((a, b) => (b.startTimeLocal ?? '').localeCompare(a.startTimeLocal ?? ''))

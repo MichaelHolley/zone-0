@@ -7,12 +7,12 @@
 		formatDuration,
 		type MeasurementSystem
 	} from '#lib/format.js';
-	import { getWeekWorkouts } from '#lib/remote/pulse.remote.js';
+	import { getRecentWorkouts } from '#lib/remote/pulse.remote.js';
 	import { sum } from '#lib/stats.js';
 
 	let { system }: { system: MeasurementSystem } = $props();
 
-	const workouts = $derived(await getWeekWorkouts());
+	const workouts = $derived(await getRecentWorkouts());
 	const totalDuration = $derived(sum(workouts.map((w) => w.duration)));
 
 	const effectLabel = (label: string) => {
@@ -23,7 +23,7 @@
 
 {#if workouts.length === 0}
 	<EmptyState
-		title="No workouts yet this week"
+		title="No workouts in the past 7 days"
 		description="Activities appear here once your watch syncs."
 	/>
 {:else}
