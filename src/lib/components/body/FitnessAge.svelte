@@ -40,7 +40,6 @@
 			<Tile
 				label="Achievable fitness age"
 				value={formatNumber(fitnessAge.achievableAge, 1)}
-				positive={fitnessAge.achievableAge < fitnessAge.fitnessAge}
 				unit="years"
 			>
 				{#snippet detail()}Best possible with these factors{/snippet}
@@ -51,28 +50,17 @@
 	{#if fitnessAge.components.length > 0}
 		<div class="mt-3">
 			<Table {columns}>
-				{#each fitnessAge.components as component (component.key)}
-					{@const targetImproves =
-						component.target != null &&
-						(component.key === 'bmi' || component.key === 'rhr'
-							? component.target < component.value
-							: component.target > component.value)}
+				{#each fitnessAge.components as component (component.label)}
 					<tr>
 						<RowHeader>{component.label}</RowHeader>
 						<Cell numeric>
 							{formatNumber(component.value, 1)}
 							{component.unit}
 						</Cell>
-						<Cell numeric class={targetImproves ? 'text-good' : undefined}>
+						<Cell numeric>
 							{orDash(component.target, (target) => `${formatNumber(target, 1)} ${component.unit}`)}
 						</Cell>
-						<Cell
-							numeric
-							class={component.potentialAge != null &&
-							component.potentialAge < fitnessAge.fitnessAge
-								? 'text-good'
-								: undefined}
-						>
+						<Cell numeric>
 							{orDash(component.potentialAge, (age) => formatNumber(age, 1))}
 						</Cell>
 					</tr>
