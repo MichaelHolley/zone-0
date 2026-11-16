@@ -27,7 +27,10 @@
 		<Tile label="Fitness age" value={formatNumber(fitnessAge.fitnessAge, 1)} unit="years">
 			{#snippet detail()}
 				{#if fitnessAge.chronologicalAge != null}
-					{formatNumber(Math.abs(fitnessAge.chronologicalAge - fitnessAge.fitnessAge), 1)} years
+					<span class={{ 'text-good': fitnessAge.fitnessAge < fitnessAge.chronologicalAge }}>
+						{formatNumber(Math.abs(fitnessAge.chronologicalAge - fitnessAge.fitnessAge), 1)}
+					</span>
+					years
 					{fitnessAge.fitnessAge <= fitnessAge.chronologicalAge ? 'younger' : 'older'} than your actual
 					age of {fitnessAge.chronologicalAge}
 				{/if}
@@ -37,6 +40,7 @@
 			<Tile
 				label="Achievable fitness age"
 				value={formatNumber(fitnessAge.achievableAge, 1)}
+				positive={fitnessAge.achievableAge < fitnessAge.fitnessAge}
 				unit="years"
 			>
 				{#snippet detail()}Best possible with these factors{/snippet}
@@ -47,17 +51,28 @@
 	{#if fitnessAge.components.length > 0}
 		<div class="mt-3">
 			<Table {columns}>
-				{#each fitnessAge.components as component (component.label)}
+				{#each fitnessAge.components as component (component.key)}
+					{@const targetImproves =
+						component.target != null &&
+						(component.key === 'bmi' || component.key === 'rhr'
+							? component.target < component.value
+							: component.target > component.value)}
 					<tr>
 						<RowHeader>{component.label}</RowHeader>
 						<Cell numeric>
 							{formatNumber(component.value, 1)}
 							{component.unit}
 						</Cell>
-						<Cell numeric>
+						<Cell numeric class={targetImproves ? 'text-good' : undefined}>
 							{orDash(component.target, (target) => `${formatNumber(target, 1)} ${component.unit}`)}
 						</Cell>
-						<Cell numeric>
+						<Cell
+							numeric
+							class={component.potentialAge != null &&
+							component.potentialAge < fitnessAge.fitnessAge
+								? 'text-good'
+								: undefined}
+						>
 							{orDash(component.potentialAge, (age) => formatNumber(age, 1))}
 						</Cell>
 					</tr>
