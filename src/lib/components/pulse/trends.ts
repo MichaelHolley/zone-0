@@ -1,4 +1,4 @@
-import { areaY, barY, defineChart, lineY, ruleY } from '@tanstack/charts';
+import { areaY, barY, defineChart, dot, lineY, ruleY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { scaleUtc } from 'd3-scale';
@@ -113,7 +113,7 @@ export function rechargeTrend(rows: TrendRow[]) {
 export function stressTrend(rows: TrendRow[]) {
 	return defineChart({
 		marks: [
-			barY(rows, { x: 'date', y: 'stressMax', fill: ACCENT, fillOpacity: 0.2, radius: { end: 2 } }),
+			dot(rows, { x: 'date', y: 'stressMax', fill: ACCENT, fillOpacity: 0.6, r: 2.5 }),
 			lineY(rows, { x: 'date', y: 'stressAvg', stroke: ACCENT, strokeWidth: 1.75 })
 		],
 		scales: barAxes(rows),
