@@ -75,12 +75,22 @@
 		>
 			{#snippet detail()}Measured {formatLongDate(body.current!.date)}{/snippet}
 		</Tile>
-		<Tile label="Change, 30 days" value={showChange(body.change30)} {unit}>
+		<Tile
+			label="Change, 30 days"
+			value={showChange(body.change30)}
+			positive={body.change30 != null && body.change30 < 0}
+			{unit}
+		>
 			{#snippet detail()}
 				{body.change30 == null ? 'No entry from a month ago' : 'Compared with 30 days ago'}
 			{/snippet}
 		</Tile>
-		<Tile label="Change, 12 months" value={showChange(body.change365)} {unit}>
+		<Tile
+			label="Change, 12 months"
+			value={showChange(body.change365)}
+			positive={body.change365 != null && body.change365 < 0}
+			{unit}
+		>
 			{#snippet detail()}Since the first entry in this period{/snippet}
 		</Tile>
 		{#if body.current.bmi}

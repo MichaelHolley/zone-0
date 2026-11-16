@@ -4,6 +4,7 @@
 	let {
 		label,
 		value,
+		positive = false,
 		unit,
 		detail,
 		children,
@@ -11,6 +12,7 @@
 	}: {
 		label: string;
 		value: string;
+		positive?: boolean;
 		unit?: string;
 		detail?: Snippet;
 		children?: Snippet;
@@ -21,7 +23,12 @@
 <article class={['flex flex-col rounded-2xl bg-mist p-5', className]}>
 	<h3 class="text-sm font-medium text-ash">{label}</h3>
 	<p class="mt-1.5 flex items-baseline gap-1.5">
-		<span class="text-[2rem] leading-tight font-semibold tracking-tight tabular-nums">{value}</span>
+		<span
+			class={[
+				'text-[2rem] leading-tight font-semibold tracking-tight tabular-nums',
+				positive && 'text-good'
+			]}>{value}</span
+		>
 		{#if unit}<span class="text-sm font-medium text-ash">{unit}</span>{/if}
 	</p>
 	{#if detail}

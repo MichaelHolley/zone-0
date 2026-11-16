@@ -79,6 +79,7 @@ export const getFitnessAge = query(async () => {
 		if (component?.value == null) return [];
 		return [
 			{
+				key,
 				label,
 				unit,
 				value: component.value,
