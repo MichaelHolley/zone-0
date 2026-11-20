@@ -62,10 +62,10 @@
 					x: 'date',
 					y: 'weight',
 					stroke: ACCENT,
-					strokeWidth: 1.25,
-					strokeOpacity: 0.4,
-					points: true
+					strokeWidth: 1,
+					strokeOpacity: 0.2
 				}),
+				dot(rows, { x: 'date', y: 'weight', fill: ACCENT, fillOpacity: 0.3, r: 2 }),
 				decorative(
 					link(weeklySegments, {
 						x1: 'previousDate',
@@ -155,7 +155,7 @@
 		{#snippet aside()}
 			<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ash">
 				<p class="flex items-center gap-2">
-					<span class="w-5 border-t border-accent opacity-40"></span>
+					<span class="w-5 border-t border-accent opacity-20"></span>
 					Daily readings
 				</p>
 				{#if goal != null}
