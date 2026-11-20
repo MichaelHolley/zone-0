@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { defineChart, lineY, ruleY } from '@tanstack/charts';
+	import { defineChart, dot, lineY, link, ruleY } from '@tanstack/charts';
+	import { decorative } from '@tanstack/charts/mark/decorative';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { Chart } from '@tanstack/charts/svelte';
 	import { tooltip } from '@tanstack/charts/tooltip';
@@ -7,7 +8,7 @@
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import Panel from '#lib/components/Panel.svelte';
 	import Tile from '#lib/components/Tile.svelte';
-	import { ACCENT, chartTheme, dateTick } from '#lib/charts.js';
+	import { ACCENT, chartTheme, dateTick, DAY_MS } from '#lib/charts.js';
 	import {
 		formatLongDate,
 		formatNumber,
@@ -23,7 +24,25 @@
 	const body = $derived(await getBody());
 	const unit = $derived(weightUnit(system));
 	const rows = $derived(
-		body.series.map((point) => ({ date: point.date, weight: toWeight(point.grams, system) }))
+		body.series.map((point) => ({
+			date: point.date,
+			weight: toWeight(point.grams, system),
+			kind: 'daily' as const
+		}))
+	);
+	const weeklyRows = $derived(
+		body.weeklySeries.map((point) => ({
+			date: point.date,
+			weight: toWeight(point.grams, system),
+			kind: 'weekly' as const
+		}))
+	);
+	const weeklySegments = $derived(
+		weeklyRows.flatMap((point, index) => {
+			const previous = weeklyRows[index - 1];
+			if (!previous || point.date.getTime() - previous.date.getTime() !== 7 * DAY_MS) return [];
+			return [{ ...point, previousDate: previous.date, previousWeight: previous.weight }];
+		})
 	);
 	const goal = $derived(body.goalGrams == null ? null : toWeight(body.goalGrams, system));
 
@@ -39,7 +58,37 @@
 				...(goal == null
 					? []
 					: [ruleY([goal], { stroke: chartTheme.foreground, strokeDasharray: '4 4' })]),
-				lineY(rows, { x: 'date', y: 'weight', stroke: ACCENT, strokeWidth: 2, points: true })
+				lineY(rows, {
+					x: 'date',
+					y: 'weight',
+					stroke: ACCENT,
+					strokeWidth: 1.25,
+					strokeOpacity: 0.4,
+					points: true
+				}),
+				decorative(
+					link(weeklySegments, {
+						x1: 'previousDate',
+						y1: 'previousWeight',
+						x2: 'date',
+						y2: 'weight',
+						stroke: (point) =>
+							point.weight < point.previousWeight
+								? 'var(--color-good)'
+								: point.weight > point.previousWeight
+									? 'var(--color-red-600)'
+									: chartTheme.foreground,
+						strokeWidth: 3
+					})
+				),
+				dot(weeklyRows, {
+					x: 'date',
+					y: 'weight',
+					fill: '#ffffff',
+					stroke: chartTheme.foreground,
+					strokeWidth: 1.5,
+					r: 3
+				})
 			],
 			scales: {
 				x: {
@@ -53,7 +102,9 @@
 			tooltip: {
 				use: tooltip,
 				format: (p) =>
-					`${formatShortDate(p.datum.date)}\n${formatNumber(p.datum.weight, 1)} ${unit}`
+					p.datum.kind === 'weekly'
+						? `Week of ${formatLongDate(p.datum.date.toISOString())}\nWeekly average: ${formatNumber(p.datum.weight, 1)} ${unit}`
+						: `${formatShortDate(p.datum.date)}\n${formatNumber(p.datum.weight, 1)} ${unit}`
 			}
 		})
 	);
@@ -102,14 +153,39 @@
 
 	<Panel title="Weight ({unit})" class="mt-3">
 		{#snippet aside()}
-			{#if goal != null}
-				<p class="flex items-center gap-2 text-[13px] text-ash">
-					<span class="w-5 border-t border-dashed border-ash"></span>
-					Goal {formatNumber(goal, 1)}
-					{unit}
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ash">
+				<p class="flex items-center gap-2">
+					<span class="w-5 border-t border-accent opacity-40"></span>
+					Daily readings
 				</p>
-			{/if}
+				{#if goal != null}
+					<p class="flex items-center gap-2">
+						<span class="w-5 border-t border-dashed border-ash"></span>
+						Goal {formatNumber(goal, 1)}
+						{unit}
+					</p>
+				{/if}
+			</div>
 		{/snippet}
-		<Chart {definition} ariaLabel="Weight over the last 12 months" height={320} />
+		<Chart
+			{definition}
+			ariaLabel="Daily weight and weekly averages over the last 12 months"
+			height={320}
+		/>
+		<div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ash">
+			<span>Weekly average:</span>
+			<span class="flex items-center gap-2">
+				<span class="w-5 border-t-[3px] border-good"></span> Decrease
+			</span>
+			<span class="flex items-center gap-2">
+				<span class="w-5 border-t-[3px] border-red-600"></span> Increase
+			</span>
+			<span class="flex items-center gap-2">
+				<span class="w-5 border-t-[3px] border-ash"></span> Unchanged
+			</span>
+		</div>
+		<p class="mt-2 text-[13px] text-ash">
+			Averages use logged daily weights; weeks without entries leave a gap.
+		</p>
 	</Panel>
 {/if}

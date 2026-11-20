@@ -2,11 +2,11 @@ import { query } from '$app/server';
 import { utcDate } from '#lib/format.js';
 import { cached, HOUR } from '#lib/server/garmin/cache.js';
 import { garmin, unwrap } from '#lib/server/garmin/client.js';
-import { addDays } from '#lib/server/garmin/dates.js';
+import { addDays, weekStart } from '#lib/server/garmin/dates.js';
 import { getToday } from '#lib/server/garmin/settings.js';
 
 export const getBody = query(async () => {
-	const { today } = await getToday();
+	const { settings, today } = await getToday();
 	const start = addDays(today, -364);
 	const path = { startDate: start, endDate: today };
 
@@ -31,6 +31,15 @@ export const getBody = query(async () => {
 		})
 		.toSorted((a, b) => a.date.localeCompare(b.date));
 
+	const byWeek = new Map<string, { grams: number; count: number }>();
+	for (const point of points) {
+		const week = weekStart(point.date, settings.firstDayOfWeek);
+		const entry = byWeek.get(week) ?? { grams: 0, count: 0 };
+		entry.grams += point.grams;
+		entry.count++;
+		byWeek.set(week, entry);
+	}
+
 	// The spec types startDate as ConnectDate, but the API returns a plain YYYY-MM-DD string.
 	const goalStart = (goal: { startDate?: unknown }) => String(goal.startDate ?? '');
 	const goal = (goals.userGoals ?? [])
@@ -44,6 +53,10 @@ export const getBody = query(async () => {
 
 	return {
 		series: points.map((p) => ({ date: utcDate(p.date), grams: p.grams })),
+		weeklySeries: [...byWeek].map(([week, entry]) => ({
+			date: utcDate(week),
+			grams: entry.grams / entry.count
+		})),
 		goalGrams: goal?.goalValue ?? null,
 		current: latest && { grams: latest.grams, date: latest.date, bmi: latest.bmi },
 		change30: latest && monthAgo ? latest.grams - monthAgo.grams : null,
