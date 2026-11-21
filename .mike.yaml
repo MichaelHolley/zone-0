@@ -1,0 +1,2 @@
+setup: pnpm install --frozen-lockfile
+checks: [pnpm run lint, pnpm run check]
