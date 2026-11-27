@@ -27,8 +27,10 @@
 			class={[
 				'text-[2rem] leading-tight font-semibold tracking-tight tabular-nums',
 				positive && 'text-good'
-			]}>{value}</span
+			]}
 		>
+			{value}
+		</span>
 		{#if unit}<span class="text-sm font-medium text-ash">{unit}</span>{/if}
 	</p>
 	{#if detail}

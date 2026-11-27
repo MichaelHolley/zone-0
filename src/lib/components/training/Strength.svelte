@@ -91,8 +91,9 @@
 					<Cell numeric>{orDash(session.heartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
 					<Cell numeric>{orDash(session.maxHeartRate, (hr) => `${formatNumber(hr)} bpm`)}</Cell>
 					<Cell numeric>{orDash(session.aerobicEffect, (effect) => formatNumber(effect, 1))}</Cell>
-					<Cell numeric>{orDash(session.anaerobicEffect, (effect) => formatNumber(effect, 1))}</Cell
-					>
+					<Cell numeric>
+						{orDash(session.anaerobicEffect, (effect) => formatNumber(effect, 1))}
+					</Cell>
 					<Cell numeric>{orDash(session.calories, formatNumber)}</Cell>
 				</tr>
 			{/each}
